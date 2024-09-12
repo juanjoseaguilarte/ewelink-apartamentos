@@ -7,7 +7,7 @@ services:
     volumes:
       - ./:/
     ports:
-      - "30010:30010"
+      - "8080:8080"
     environment:
       - NODE_ENV=development
     command: bash -c "npm install && node index.js"
