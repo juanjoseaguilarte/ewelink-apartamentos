@@ -3,7 +3,7 @@ const ewelink = require('ewelink-api');
 const cors = require('cors');
 
 const app = express();
-const port = 30010;
+const port = 8080;
 
 // Configuración de CORS para aceptar todas las solicitudes
 app.use(cors({
