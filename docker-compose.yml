@@ -3,9 +3,9 @@ services:
   backend:
     image: node:16
     container_name: express-backend
-    working_dir: /app
+    working_dir: /
     volumes:
-      - ./:/app
+      - ./:/
     ports:
       - "30010:30010"
     environment:
