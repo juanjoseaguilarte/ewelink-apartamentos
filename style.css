@@ -1,0 +1,55 @@
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+.user-info,
+.msg {
+  max-width: 600px;
+  margin: auto;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  text-align: center; /* Asegura que el contenido dentro del contenedor esté centrado */
+}
+
+h2 {
+  text-align: center;
+}
+
+.msg,
+.user-info {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.user-info p {
+  font-weight: bold;
+}
+
+/* Ajustes para centrar el botón */
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+button:enabled:hover {
+  background-color: #0056b3;
+}
