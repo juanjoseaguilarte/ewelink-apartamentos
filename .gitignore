@@ -1,1 +1,4 @@
+# Ignorar archivos de configuración del sistema
 .env
+*.env.local
+*.env.*.local
