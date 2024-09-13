@@ -1,14 +1,13 @@
-version: "3"
+version: '3'
 services:
   backend:
-    image: node:16
+    build: .
     container_name: express-backend
-    working_dir: /app # Mantén el directorio de trabajo como /app
-    volumes:
-      - ./:/app # Montar todo el directorio raíz en /app dentro del contenedor
     ports:
       - "3000:3000"
+    volumes:
+      - ./:/app
     environment:
       - NODE_ENV=development
-    command: bash -c "npm install && node backend.js"
+    command: npm start
     restart: unless-stopped
