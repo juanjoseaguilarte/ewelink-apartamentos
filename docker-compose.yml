@@ -3,9 +3,9 @@ services:
   backend:
     image: node:16
     container_name: express-backend
-    working_dir: /
+    working_dir: /app  # Define un directorio de trabajo como /app
     volumes:
-      - ./:/
+      - ./:/app  # Monta el directorio actual en /app dentro del contenedor
     ports:
       - "8080:8080"
     environment:
