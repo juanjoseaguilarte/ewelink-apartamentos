@@ -7,7 +7,7 @@ services:
     volumes:
       - ./:/app # Montar todo el directorio raíz en /app dentro del contenedor
     ports:
-      - "8080:8080"
+      - "3000:3000"
     environment:
       - NODE_ENV=development
     command: bash -c "npm install && node backend.js"
