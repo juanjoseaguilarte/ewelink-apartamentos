@@ -1,13 +1,14 @@
 version: '3'
 services:
-  app:
-    build: .
-    container_name: node-app
-    ports:
-      - "3002"
+  backend:
+    image: node:16
+    container_name: express-backend
+    working_dir: /app
     volumes:
-      - .:/app
+      - .:/app  # Asegúrate de que el '.' se refiere al directorio raíz donde está package.json
+    ports:
+      - "3001:3001"
     environment:
       - NODE_ENV=development
-    command: npm start
+    command: bash -c "npm install && npm start"
     restart: unless-stopped
