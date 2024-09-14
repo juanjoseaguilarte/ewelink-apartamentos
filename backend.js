@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require("uuid"); // Importar uuid para generar GUID
 require("dotenv").config(); // Importar dotenv para leer variables de entorno
 
 const app = express();
-const port = process.env.PORT || 3001; // Leer el puerto desde variables de entorno o usar el 3000 por defecto
+const port = process.env.PORT || 3002; // Leer el puerto desde variables de entorno o usar el 3000 por defecto
 
 // Middleware para leer JSON
 app.use(express.json());
