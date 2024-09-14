@@ -1,12 +1,12 @@
 version: '3'
 services:
-  backend:
+  app:
     build: .
-    container_name: express-backend
+    container_name: node-app
     ports:
-      - "3000:3000"
+      - "3001:3001"
     volumes:
-      - ./:/app
+      - .:/app
     environment:
       - NODE_ENV=development
     command: npm start
