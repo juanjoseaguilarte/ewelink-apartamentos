@@ -1,4 +1,3 @@
-// listarreservas.js
 document.addEventListener("DOMContentLoaded", async function () {
     try {
         const response = await fetch("http://185.253.154.145:3002/api/usuarioall");
@@ -28,6 +27,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 button.addEventListener('click', function () {
                     const id = this.getAttribute('data-id');
                     const link = `http://185.253.154.145:3002/api/usuario/${id}`;
+                    console.log(`Copiando enlace: ${link}`); // Debugging
                     copiarAlPortapapeles(link);
                 });
             });
@@ -39,8 +39,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 });
 
-// Crear la fila de la reserva en la tabla
-// listarreservas.js
 // Crear la fila de la reserva en la tabla
 function crearFilaReserva(reserva) {
     return `
@@ -61,9 +59,18 @@ function crearFilaReserva(reserva) {
 
 // Función para copiar al portapapeles
 function copiarAlPortapapeles(texto) {
+    // Verificar si la API está disponible
+    if (!navigator.clipboard) {
+        console.error("La API del portapapeles no está disponible.");
+        alert('La función de copiar no es compatible con este navegador.');
+        return;
+    }
+
     navigator.clipboard.writeText(texto).then(() => {
+        console.log('Enlace copiado al portapapeles: ' + texto); // Debugging
         alert('Enlace copiado al portapapeles: ' + texto);
     }).catch(err => {
+        console.error('Error al copiar el enlace:', err); // Debugging
         alert('Error al copiar el enlace: ' + err);
     });
 }
