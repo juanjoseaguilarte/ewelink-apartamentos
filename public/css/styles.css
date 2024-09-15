@@ -1,28 +1,17 @@
 /* styles.css */
-
-/* Reset básico */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
   background-color: #f0f0f0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh; /* Ocupa toda la altura de la pantalla */
-  padding: 20px; /* Añadir un padding para espacios más pequeños */
 }
 
 /* Menú de navegación */
 nav {
+  margin-bottom: 20px;
   text-align: center;
   background-color: #007bff;
   padding: 10px 0;
-  margin-bottom: 20px;
 }
 
 nav a {
@@ -36,24 +25,19 @@ nav a:hover {
   text-decoration: underline;
 }
 
-/* Contenedor principal */
-.container {
-  max-width: 600px;
-  width: 100%; /* Asegura que ocupe el 100% del contenedor padre */
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilo del formulario */
+/* Estilos generales para formularios */
 form {
-  width: 100%; /* Asegura que ocupe todo el ancho del contenedor */
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
   text-align: center;
-  margin-bottom: 20px;
 }
 
 input[type="text"],
@@ -77,7 +61,6 @@ button {
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  margin-top: 10px; /* Añadir un margen superior */
 }
 
 button:hover {
@@ -90,30 +73,139 @@ button:hover {
   margin-top: 10px;
 }
 
+/* Estilo específico para la vista de edición */
+.menu {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.menu a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #007bff;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   body {
     padding: 10px;
   }
 
-  .container {
+  form {
+    width: 100%;
     padding: 15px;
-  }
-
-  button {
-    padding: 10px;
-  }
-
-  .pin-box {
-    font-size: 1.5em;
-  }
-
-  p {
-    font-size: 14px;
   }
 
   nav a {
     display: block;
     margin: 5px 0;
   }
+
+  button {
+    padding: 10px;
+  }
+
+  .menu {
+    flex-direction: column;
+  }
+
+  .menu a {
+    margin: 5px 0;
+  }
 }
+
+/* Estilos para la tabla en listarreservas.html */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.edit-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  text-decoration: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  th,
+  td {
+    font-size: 14px;
+  }
+} /* Estilos para los botones */
+.edit-btn,
+.copy-link-btn,
+.delete-btn {
+  display: inline-block;
+  width: 100px; /* Ancho específico para los botones */
+  padding: 8px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+  margin: 5px; /* Espacio entre los botones */
+  text-decoration: none; /* Quitar subrayado en los links */
+  box-sizing: border-box; /* Asegura que el ancho incluya padding y border */
+}
+
+/* Estilo específico para el botón "Editar" */
+.edit-btn {
+  background-color: #007bff;
+}
+
+.edit-btn:hover {
+  background-color: #0056b3; /* Color para el hover */
+}
+
+/* Estilo específico para el botón "Copiar Link" */
+.copy-link-btn {
+  background-color: #28a745;
+}
+
+.copy-link-btn:hover {
+  background-color: #218838; /* Color de hover para "Copiar Link" */
+}
+
+/* Estilo específico para el botón "Borrar" */
+.delete-btn {
+  background-color: #dc3545; /* Color rojo */
+}
+
+.delete-btn:hover {
+  background-color: #c82333; /* Color de hover para "Borrar" */
+}
+
+/* Ajuste para la tabla y contenedor de botones */
+td {
+  vertical-align: middle; /* Asegura que el contenido esté centrado verticalmente */
+}
+
+td .button-container {
+  display: flex; /* Alinea los botones en fila */
+  justify-content: space-around; /* Espacio uniforme alrededor de los botones */
+}
+
