@@ -21,7 +21,7 @@ app.use(
 );
 
 // Servir archivos estáticos del frontend desde la carpeta 'public'
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 // Conectar a la base de datos SQLite (o crearla si no existe)
 const db = new sqlite3.Database("./usuarios.db", (err) => {
@@ -140,59 +140,62 @@ app.post("/api/usuario", (req, res) => {
 // Endpoint para accionar el dispositivo y restar intentos
 // Modificar el endpoint para accionar el dispositivo y verificar fechas y horarios
 app.get("/api/toggle-device", async (req, res) => {
-  const userId = req.query.userId; // Obtener el ID del usuario desde los parámetros de la URL
+  const userId = req.query.userId;
 
   if (!userId) {
-      return res.status(400).send("Falta el ID del usuario");
+    return res.status(400).send("Falta el ID del usuario");
   }
 
   // Verificar si el usuario existe y tiene acceso permitido
   db.get(`SELECT * FROM usuarios WHERE id = ?`, [userId], async (err, user) => {
-      if (err || !user) {
-          return res.status(404).send("Usuario no encontrado");
-      }
+    if (err || !user) {
+      return res.status(404).send("Usuario no encontrado");
+    }
 
-      // Obtener la fecha y hora actuales
-      const fechaActual = new Date().toISOString().split('T')[0];
-      const horaActual = new Date().toLocaleTimeString('es-ES', { hour12: false });
+    // Obtener la fecha y hora actuales
+    const fechaActual = new Date().toISOString().split("T")[0];
+    const horaActual = new Date()
+      .toLocaleTimeString("es-ES", { hour12: false })
+      .slice(0, 5); // Obtiene solo HH:mm
 
-      // Verificar si la fecha actual está entre las fechas de entrada y salida del usuario
-      if (fechaActual >= user.fecha_entrada && fechaActual <= user.fecha_salida) {
-          // Verificar si la hora actual está dentro del horario permitido
-          if (horaActual >= user.hora_entrada && horaActual <= user.hora_salida) {
-              // Verificar si el usuario tiene intentos disponibles
-              if (user.intentos > 0) {
-                  try {
-                      // Accionar el dispositivo a través de eWeLink
-                      await connection.toggleDevice(process.env.DEVICE_ID);
+    // Verificar si la fecha actual está entre las fechas de entrada y salida del usuario
+    if (fechaActual >= user.fecha_entrada && fechaActual <= user.fecha_salida) {
+      // Verificar si la hora actual está dentro del horario permitido
+      if (horaActual >= user.hora_entrada && horaActual <= user.hora_salida) {
+        // Verificar si el usuario tiene intentos disponibles
+        if (user.intentos > 0) {
+          try {
+            // Accionar el dispositivo a través de eWeLink
+            await connection.toggleDevice(process.env.DEVICE_ID);
 
-                      // Restar un intento
-                      db.run(
-                          `UPDATE usuarios SET intentos = intentos - 1 WHERE id = ?`,
-                          [userId],
-                          (err) => {
-                              if (err) {
-                                  return res.status(500).send("Error al actualizar los intentos");
-                              }
-                              res.send("Dispositivo activado y intentos actualizados");
-                          }
-                      );
-                  } catch (error) {
-                      console.error("Error al accionar el dispositivo:", error);
-                      res.status(500).send("Error al accionar el dispositivo");
-                  }
-              } else {
-                  res.status(400).send("No hay intentos disponibles");
+            // Restar un intento
+            db.run(
+              `UPDATE usuarios SET intentos = intentos - 1 WHERE id = ?`,
+              [userId],
+              (err) => {
+                if (err) {
+                  return res
+                    .status(500)
+                    .send("Error al actualizar los intentos");
+                }
+                res.send("Dispositivo activado y intentos actualizados");
               }
-          } else {
-              res.status(403).send("Fuera del horario permitido");
+            );
+          } catch (error) {
+            console.error("Error al accionar el dispositivo:", error);
+            res.status(500).send("Error al accionar el dispositivo");
           }
+        } else {
+          res.status(400).send("No hay intentos disponibles");
+        }
       } else {
-          res.status(403).send("Fuera de las fechas permitidas");
+        res.status(403).send("Fuera del horario permitido");
       }
+    } else {
+      res.status(403).send("Fuera de las fechas permitidas");
+    }
   });
 });
-
 
 // Endpoint para actualizar una reserva
 app.put("/api/usuario/:id", (req, res) => {
