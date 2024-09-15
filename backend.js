@@ -157,10 +157,15 @@ app.get("/api/toggle-device", async (req, res) => {
     const fechaEntrada = new Date(user.fecha_entrada);
     const fechaSalida = new Date(user.fecha_salida);
 
+    // Log para ver las fechas
+    console.log("Fecha Actual:", fechaActual);
+    console.log("Fecha Entrada:", fechaEntrada);
+    console.log("Fecha Salida:", fechaSalida);
+
     // Verificar si la fecha actual está entre las fechas de entrada y salida del usuario
     if (fechaActual >= fechaEntrada && fechaActual <= fechaSalida) {
-      // Verificar si la hora actual está dentro del horario permitido
-      console.log("he pasado")
+      console.log("Dentro del rango de fechas permitido");
+
       // Crear objetos de tiempo para comparar las horas
       const [horaEntradaHoras, horaEntradaMinutos] =
         user.hora_entrada.split(":");
@@ -173,8 +178,15 @@ app.get("/api/toggle-device", async (req, res) => {
       const horaSalida = new Date(fechaActual);
       horaSalida.setHours(horaSalidaHoras, horaSalidaMinutos, 0, 0);
 
+      // Log para ver las horas
+      console.log("Hora Actual:", horaActual);
+      console.log("Hora Entrada:", horaEntrada);
+      console.log("Hora Salida:", horaSalida);
+
       // Verificar si la hora actual está dentro del rango permitido
       if (horaActual >= horaEntrada && horaActual <= horaSalida) {
+        console.log("Dentro del rango de horas permitido");
+
         // Verificar si el usuario tiene intentos disponibles
         if (user.intentos > 0) {
           try {
@@ -202,9 +214,17 @@ app.get("/api/toggle-device", async (req, res) => {
           res.status(400).send("No hay intentos disponibles");
         }
       } else {
+        console.log("Fuera del horario permitido");
+        console.log(
+          `Hora actual: ${horaActual}, Hora entrada: ${horaEntrada}, Hora salida: ${horaSalida}`
+        );
         res.status(403).send("Fuera del horario permitido");
       }
     } else {
+      console.log("Fuera de las fechas permitidas");
+      console.log(
+        `Fecha actual: ${fechaActual}, Fecha entrada: ${fechaEntrada}, Fecha salida: ${fechaSalida}`
+      );
       res.status(403).send("Fuera de las fechas permitidas");
     }
   });
