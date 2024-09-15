@@ -1,5 +1,76 @@
 /* user-details.css */
 
+/* styles.css */
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  /* Menú de navegación */
+  nav {
+    text-align: center;
+    background-color: #007bff;
+    padding: 10px 0;
+  }
+  
+  nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+  }
+  
+  nav a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Contenedor general */
+  .container {
+    max-width: 600px;
+    width: 100%;
+    margin: auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Estilo para mensajes */
+  .msg {
+    text-align: center;
+    margin-top: 10px;
+    color: red;
+  }
+  
+  /* Responsive */
+  @media (max-width: 480px) {
+    body {
+      padding: 10px;
+    }
+  
+    .container {
+      padding: 15px;
+    }
+  
+    nav a {
+      display: block;
+      margin: 5px 0;
+    }
+  }
+
 /* Caja para el PIN y el botón de abrir puerta */
 .pin-container {
     background-color: white;
