@@ -43,6 +43,7 @@ function displayUserInfo(user) {
         <p><strong>Hora de Entrada:</strong> ${user.hora_entrada}</p>
         <p><strong>Hora de Salida:</strong> ${user.hora_salida}</p>
         <p><strong>Intentos Restantes:</strong> ${user.intentos}</p>
+        <p><strong>Pin Caja Seguridad:</strong> ${user.pin}</p>
     `;
 }
 
