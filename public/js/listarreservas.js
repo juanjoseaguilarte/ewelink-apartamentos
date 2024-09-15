@@ -57,6 +57,7 @@ function crearFilaReserva(reserva) {
               <td>${reserva.apellido}</td>
               <td>${reserva.fecha_entrada}</td>
               <td>${reserva.fecha_salida}</td>
+              <td>${reserva.pin}</td>
               <td>
                   <div class="button-container">
                       <a href="editreserva.html?id=${reserva.id}" class="edit-btn">Editar</a>
