@@ -153,15 +153,28 @@ app.get("/api/toggle-device", async (req, res) => {
     }
 
     // Obtener la fecha y hora actuales
-    const fechaActual = new Date().toISOString().split("T")[0];
-    const horaActual = new Date()
-      .toLocaleTimeString("es-ES", { hour12: false })
-      .slice(0, 5); // Obtiene solo HH:mm
+    const fechaActual = new Date();
+    const fechaEntrada = new Date(user.fecha_entrada);
+    const fechaSalida = new Date(user.fecha_salida);
 
     // Verificar si la fecha actual está entre las fechas de entrada y salida del usuario
-    if (fechaActual >= user.fecha_entrada && fechaActual <= user.fecha_salida) {
+    if (fechaActual >= fechaEntrada && fechaActual <= fechaSalida) {
       // Verificar si la hora actual está dentro del horario permitido
-      if (horaActual >= user.hora_entrada && horaActual <= user.hora_salida) {
+
+      // Crear objetos de tiempo para comparar las horas
+      const [horaEntradaHoras, horaEntradaMinutos] =
+        user.hora_entrada.split(":");
+      const [horaSalidaHoras, horaSalidaMinutos] = user.hora_salida.split(":");
+
+      const horaActual = new Date(fechaActual); // Obtener la hora actual
+      const horaEntrada = new Date(fechaActual);
+      horaEntrada.setHours(horaEntradaHoras, horaEntradaMinutos, 0, 0);
+
+      const horaSalida = new Date(fechaActual);
+      horaSalida.setHours(horaSalidaHoras, horaSalidaMinutos, 0, 0);
+
+      // Verificar si la hora actual está dentro del rango permitido
+      if (horaActual >= horaEntrada && horaActual <= horaSalida) {
         // Verificar si el usuario tiene intentos disponibles
         if (user.intentos > 0) {
           try {
