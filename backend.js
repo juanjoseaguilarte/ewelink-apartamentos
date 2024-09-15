@@ -139,6 +139,7 @@ app.post("/api/usuario", (req, res) => {
 
 // Endpoint para accionar el dispositivo y restar intentos
 // Modificar el endpoint para accionar el dispositivo y verificar fechas y horarios
+// Endpoint para accionar el dispositivo y restar intentos
 app.get("/api/toggle-device", async (req, res) => {
   const userId = req.query.userId;
 
@@ -154,78 +155,55 @@ app.get("/api/toggle-device", async (req, res) => {
 
     // Obtener la fecha y hora actuales
     const fechaActual = new Date();
-    const fechaEntrada = new Date(user.fecha_entrada);
-    const fechaSalida = new Date(user.fecha_salida);
+    const horaActual = new Date();
 
-    // Log para ver las fechas
+    // Crear objetos de fecha y hora para la entrada y salida
+    const [horaEntradaHoras, horaEntradaMinutos] = user.hora_entrada.split(":");
+    const [horaSalidaHoras, horaSalidaMinutos] = user.hora_salida.split(":");
+
+    // Crear las fechas de entrada y salida con las horas respectivas
+    const fechaEntrada = new Date(user.fecha_entrada);
+    fechaEntrada.setHours(horaEntradaHoras, horaEntradaMinutos, 0, 0);
+
+    const fechaSalida = new Date(user.fecha_salida);
+    fechaSalida.setHours(horaSalidaHoras, horaSalidaMinutos, 0, 0);
+
+    // Verificar si la fecha y hora actuales están dentro del rango permitido
     console.log("Fecha Actual:", fechaActual);
     console.log("Fecha Entrada:", fechaEntrada);
     console.log("Fecha Salida:", fechaSalida);
+    console.log("Hora Actual:", horaActual);
 
-    // Verificar si la fecha actual está entre las fechas de entrada y salida del usuario
     if (fechaActual >= fechaEntrada && fechaActual <= fechaSalida) {
-      console.log("Dentro del rango de fechas permitido");
+      // Verificar si el usuario tiene intentos disponibles
+      if (user.intentos > 0) {
+        try {
+          // Accionar el dispositivo a través de eWeLink
+          await connection.toggleDevice(process.env.DEVICE_ID);
 
-      // Crear objetos de tiempo para comparar las horas
-      const [horaEntradaHoras, horaEntradaMinutos] =
-        user.hora_entrada.split(":");
-      const [horaSalidaHoras, horaSalidaMinutos] = user.hora_salida.split(":");
-
-      const horaActual = new Date(fechaActual); // Obtener la hora actual
-      const horaEntrada = new Date(fechaActual);
-      horaEntrada.setHours(horaEntradaHoras, horaEntradaMinutos, 0, 0);
-
-      const horaSalida = new Date(fechaActual);
-      horaSalida.setHours(horaSalidaHoras, horaSalidaMinutos, 0, 0);
-
-      // Log para ver las horas
-      console.log("Hora Actual:", horaActual);
-      console.log("Hora Entrada:", horaEntrada);
-      console.log("Hora Salida:", horaSalida);
-
-      // Verificar si la hora actual está dentro del rango permitido
-      if (horaActual >= horaEntrada && horaActual <= horaSalida) {
-        console.log("Dentro del rango de horas permitido");
-
-        // Verificar si el usuario tiene intentos disponibles
-        if (user.intentos > 0) {
-          try {
-            // Accionar el dispositivo a través de eWeLink
-            await connection.toggleDevice(process.env.DEVICE_ID);
-
-            // Restar un intento
-            db.run(
-              `UPDATE usuarios SET intentos = intentos - 1 WHERE id = ?`,
-              [userId],
-              (err) => {
-                if (err) {
-                  return res
-                    .status(500)
-                    .send("Error al actualizar los intentos");
-                }
-                res.send("Dispositivo activado y intentos actualizados");
+          // Restar un intento
+          db.run(
+            `UPDATE usuarios SET intentos = intentos - 1 WHERE id = ?`,
+            [userId],
+            (err) => {
+              if (err) {
+                return res
+                  .status(500)
+                  .send("Error al actualizar los intentos");
               }
-            );
-          } catch (error) {
-            console.error("Error al accionar el dispositivo:", error);
-            res.status(500).send("Error al accionar el dispositivo");
-          }
-        } else {
-          res.status(400).send("No hay intentos disponibles");
+              res.send("Dispositivo activado y intentos actualizados");
+            }
+          );
+        } catch (error) {
+          console.error("Error al accionar el dispositivo:", error);
+          res.status(500).send("Error al accionar el dispositivo");
         }
       } else {
-        console.log("Fuera del horario permitido");
-        console.log(
-          `Hora actual: ${horaActual}, Hora entrada: ${horaEntrada}, Hora salida: ${horaSalida}`
-        );
-        res.status(403).send("Fuera del horario permitido");
+        res.status(400).send("No hay intentos disponibles");
       }
     } else {
-      console.log("Fuera de las fechas permitidas");
-      console.log(
-        `Fecha actual: ${fechaActual}, Fecha entrada: ${fechaEntrada}, Fecha salida: ${fechaSalida}`
-      );
-      res.status(403).send("Fuera de las fechas permitidas");
+      // Fuera del horario permitido
+      res.status(403).send("Fuera de las fechas u horas permitidas");
     }
   });
 });
