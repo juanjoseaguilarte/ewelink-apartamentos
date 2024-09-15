@@ -34,7 +34,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       document.querySelectorAll(".copy-link-btn").forEach((button) => {
         button.addEventListener("click", function () {
           const id = this.getAttribute("data-id");
-          const link = `http://185.253.154.145:3002/api/usuario/${id}`;
+          // Cambiar la ruta del enlace al archivo HTML
+          const link = `http://185.253.154.145:3002/user-details.html?id=${id}`;
           console.log(`Copiando enlace: ${link}`); // Debugging
           copiarAlPortapapeles(link);
         });
@@ -51,19 +52,19 @@ document.addEventListener("DOMContentLoaded", async function () {
 // Crear la fila de la reserva en la tabla
 function crearFilaReserva(reserva) {
   return `
-        <tr>
-            <td>${reserva.nombre}</td>
-            <td>${reserva.apellido}</td>
-            <td>${reserva.fecha_entrada}</td>
-            <td>${reserva.fecha_salida}</td>
-            <td>
-                <div class="button-container">
-                    <a href="editreserva.html?id=${reserva.id}" class="edit-btn">Editar</a>
-                    <button class="copy-link-btn" data-id="${reserva.id}">Copiar Link</button>
-                </div>
-            </td>
-        </tr>
-    `;
+          <tr>
+              <td>${reserva.nombre}</td>
+              <td>${reserva.apellido}</td>
+              <td>${reserva.fecha_entrada}</td>
+              <td>${reserva.fecha_salida}</td>
+              <td>
+                  <div class="button-container">
+                      <a href="editreserva.html?id=${reserva.id}" class="edit-btn">Editar</a>
+                      <button class="copy-link-btn" data-id="${reserva.id}">Copiar Link</button>
+                  </div>
+              </td>
+          </tr>
+      `;
 }
 
 // Función para copiar al portapapeles
