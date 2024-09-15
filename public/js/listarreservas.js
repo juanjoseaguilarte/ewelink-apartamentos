@@ -40,6 +40,16 @@ document.addEventListener("DOMContentLoaded", async function () {
           copiarAlPortapapeles(link);
         });
       });
+
+      // Añadir eventos de borrado a los botones
+      document.querySelectorAll(".delete-btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          const id = this.getAttribute("data-id");
+          if (confirm("¿Estás seguro de que deseas eliminar esta reserva?")) {
+            borrarReserva(id);
+          }
+        });
+      });
     } else {
       document.getElementById("msg").textContent =
         "Error al cargar las reservas.";
@@ -52,26 +62,26 @@ document.addEventListener("DOMContentLoaded", async function () {
 // Crear la fila de la reserva en la tabla
 function crearFilaReserva(reserva) {
   return `
-          <tr>
-              <td>${reserva.nombre}</td>
-              <td>${reserva.apellido}</td>
-              <td>${reserva.fecha_entrada}</td>
-              <td>${reserva.fecha_salida}</td>
-              <td>${reserva.pin}</td>
-              <td>
-                  <div class="button-container">
-                      <a href="editreserva.html?id=${reserva.id}" class="edit-btn">Editar</a>
-                      <button class="copy-link-btn" data-id="${reserva.id}">Copiar Link</button>
-                  </div>
-              </td>
-          </tr>
-      `;
+            <tr>
+                <td>${reserva.nombre}</td>
+                <td>${reserva.apellido}</td>
+                <td>${reserva.fecha_entrada}</td>
+                <td>${reserva.fecha_salida}</td>
+                <td>${reserva.pin}</td>
+                <td>
+                    <div class="button-container">
+                        <a href="editreserva.html?id=${reserva.id}" class="edit-btn">Editar</a>
+                        <button class="copy-link-btn" data-id="${reserva.id}">Copiar Link</button>
+                        <button class="delete-btn" data-id="${reserva.id}">Borrar</button>
+                    </div>
+                </td>
+            </tr>
+        `;
 }
 
 // Función para copiar al portapapeles
 function copiarAlPortapapeles(texto) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    // Usa la API del portapapeles si está disponible
     navigator.clipboard
       .writeText(texto)
       .then(() => {
@@ -81,7 +91,6 @@ function copiarAlPortapapeles(texto) {
         alert("Error al copiar el enlace: " + err);
       });
   } else {
-    // Método alternativo si la API no está disponible
     const textArea = document.createElement("textarea");
     textArea.value = texto;
     document.body.appendChild(textArea);
@@ -93,5 +102,25 @@ function copiarAlPortapapeles(texto) {
       alert("Error al copiar el enlace: " + err);
     }
     document.body.removeChild(textArea);
+  }
+}
+
+// Función para borrar la reserva
+async function borrarReserva(id) {
+  try {
+    const response = await fetch(
+      `http://185.253.154.145:3002/api/usuario/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (response.ok) {
+      alert("Reserva eliminada exitosamente.");
+      location.reload(); // Recargar la página para actualizar la lista
+    } else {
+      alert("Error al eliminar la reserva.");
+    }
+  } catch (error) {
+    alert("Error al conectar con el servidor.");
   }
 }
