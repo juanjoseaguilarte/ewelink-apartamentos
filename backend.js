@@ -40,7 +40,8 @@ const db = new sqlite3.Database("./usuarios.db", (err) => {
         fecha_salida TEXT,
         intentos INTEGER,
         hora_entrada TEXT DEFAULT '16:00',
-        hora_salida TEXT DEFAULT '12:00'
+        hora_salida TEXT DEFAULT '12:00',
+        pin TEXT
       )
     `);
   }
