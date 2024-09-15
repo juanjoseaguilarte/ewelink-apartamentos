@@ -1,21 +1,28 @@
+/* styles.css */
+
 /* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
   background-color: #f0f0f0;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh; /* Ocupa toda la altura de la pantalla */
+  padding: 20px; /* Añadir un padding para espacios más pequeños */
 }
 
 /* Menú de navegación */
 nav {
-  margin-bottom: 20px;
   text-align: center;
   background-color: #007bff;
   padding: 10px 0;
+  margin-bottom: 20px;
 }
 
 nav a {
@@ -30,30 +37,25 @@ nav a:hover {
 }
 
 /* Contenedor principal */
-.container,
-form,
-#userInfo,
-.pin-container {
+.container {
   max-width: 600px;
-  margin: auto;
-  padding: 20px;
+  width: 100%; /* Asegura que ocupe el 100% del contenedor padre */
   background-color: white;
+  padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
 }
 
+/* Estilo del formulario */
 form {
-  max-width: 400px;
-  margin: auto;
+  width: 100%; /* Asegura que ocupe todo el ancho del contenedor */
 }
 
-h2,
-h3 {
+h2 {
   text-align: center;
+  margin-bottom: 20px;
 }
 
-/* Campos de entrada */
 input[type="text"],
 input[type="number"],
 input[type="date"],
@@ -65,88 +67,27 @@ input[type="time"] {
   border-radius: 4px;
 }
 
-/* Estilo para el PIN */
-.pin-box {
-  font-size: 2em;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-/* Botones */
-button,
-.edit-btn,
-.copy-link-btn,
-.delete-btn {
-  display: inline-block;
-  width: 100px; /* Ancho específico para los botones */
+/* Estilos para botones */
+button {
+  width: 100%;
   padding: 12px;
+  background-color: #28a745;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  margin: 5px;
-  text-decoration: none;
-  box-sizing: border-box;
+  margin-top: 10px; /* Añadir un margen superior */
 }
 
-/* Colores de los botones */
-button,
-.copy-link-btn {
-  background-color: #28a745;
-}
-
-button:hover,
-.copy-link-btn:hover {
+button:hover {
   background-color: #218838;
 }
 
-.edit-btn {
-  background-color: #007bff;
-}
-
-.edit-btn:hover {
-  background-color: #0056b3;
-}
-
-.delete-btn {
-  background-color: #dc3545;
-}
-
-.delete-btn:hover {
-  background-color: #c82333;
-}
-
-/* Mensajes */
+/* Estilo para mensajes */
 .msg {
   text-align: center;
   margin-top: 10px;
-  color: red;
-}
-
-/* Tablas */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th,
-td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
-  vertical-align: middle; /* Centra verticalmente el contenido */
-}
-
-td .button-container {
-  display: flex;
-  justify-content: space-around; /* Espacio uniforme entre botones */
-}
-
-/* Ajuste para p */
-p {
-  margin: 10px 0;
 }
 
 /* Responsive */
@@ -155,8 +96,7 @@ p {
     padding: 10px;
   }
 
-  .container,
-  form {
+  .container {
     padding: 15px;
   }
 
