@@ -257,7 +257,18 @@ app.put("/api/usuario/:id", (req, res) => {
     });
   });
 });
+// Endpoint para eliminar una reserva
+app.delete("/api/usuario/:id", (req, res) => {
+  const userId = req.params.id;
 
+  // Eliminar el usuario de la base de datos
+  db.run(`DELETE FROM usuarios WHERE id = ?`, [userId], function (err) {
+    if (err) {
+      return res.status(500).send("Error al eliminar la reserva");
+    }
+    res.status(200).send("Reserva eliminada correctamente");
+  });
+});
 // Manejo de rutas 404
 app.use((req, res) => {
   res.status(404).send("Página no encontrada");
