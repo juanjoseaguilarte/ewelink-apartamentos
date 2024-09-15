@@ -35,7 +35,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         button.addEventListener("click", function () {
           const id = this.getAttribute("data-id");
           // Cambiar la ruta del enlace al archivo HTML
-          const link = `http://185.253.154.145:3002/user-details.html?id=${id}`;
+          const link = `http://rentalsurlalinea.duckdns.org:3002/klsdkdslkds9009sdklsdlkdskl.html?id=${id}`;
+
           console.log(`Copiando enlace: ${link}`); // Debugging
           copiarAlPortapapeles(link);
         });
