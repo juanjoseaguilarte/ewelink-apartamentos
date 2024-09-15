@@ -89,29 +89,29 @@ button:hover {
 /* Responsive */
 @media (max-width: 480px) {
   body {
-      padding: 10px;
+    padding: 10px;
   }
 
   form {
-      width: 100%;
-      padding: 15px;
+    width: 100%;
+    padding: 15px;
   }
 
   nav a {
-      display: block;
-      margin: 5px 0;
+    display: block;
+    margin: 5px 0;
   }
 
   button {
-      padding: 10px;
+    padding: 10px;
   }
 
   .menu {
-      flex-direction: column;
+    flex-direction: column;
   }
 
   .menu a {
-      margin: 5px 0;
+    margin: 5px 0;
   }
 }
 
@@ -145,15 +145,16 @@ td {
 /* Responsive */
 @media (max-width: 480px) {
   table {
-      display: block;
-      overflow-x: auto;
-      white-space: nowrap;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 
-  th, td {
-      font-size: 14px;
+  th,
+  td {
+    font-size: 14px;
   }
-}/* Estilos para los botones */
+} /* Estilos para los botones */
 .edit-btn,
 .copy-link-btn {
   display: inline-block;
@@ -193,4 +194,48 @@ td {
 td .button-container {
   display: flex; /* Alinea los botones en fila */
   justify-content: space-around; /* Espacio uniforme alrededor de los botones */
+}
+
+/* styles.css */
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+}
+
+p {
+  margin: 10px 0;
+}
+
+.button-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+.msg {
+  text-align: center;
+  margin-top: 10px;
+  color: red;
 }
