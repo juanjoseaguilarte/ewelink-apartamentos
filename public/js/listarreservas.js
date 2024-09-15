@@ -1,47 +1,56 @@
 document.addEventListener("DOMContentLoaded", async function () {
-    try {
-        const response = await fetch("http://185.253.154.145:3002/api/usuarioall");
-        if (response.ok) {
-            const reservas = await response.json();
+  try {
+    const response = await fetch("http://185.253.154.145:3002/api/usuarioall");
+    if (response.ok) {
+      const reservas = await response.json();
 
-            const fechaActual = new Date().toISOString().split('T')[0];
+      const fechaActual = new Date().toISOString().split("T")[0];
 
-            const tbodyAnteriores = document.querySelector("#reservasAnterioresTable tbody");
-            const tbodyFuturas = document.querySelector("#reservasFuturasTable tbody");
+      const tbodyAnteriores = document.querySelector(
+        "#reservasAnterioresTable tbody"
+      );
+      const tbodyFuturas = document.querySelector(
+        "#reservasFuturasTable tbody"
+      );
 
-            const reservasAnteriores = reservas.filter(reserva => reserva.fecha_salida < fechaActual);
-            const reservasFuturas = reservas.filter(reserva => reserva.fecha_salida >= fechaActual);
+      const reservasAnteriores = reservas.filter(
+        (reserva) => reserva.fecha_salida < fechaActual
+      );
+      const reservasFuturas = reservas.filter(
+        (reserva) => reserva.fecha_salida >= fechaActual
+      );
 
-            // Rellenar la tabla de reservas anteriores
-            tbodyAnteriores.innerHTML = reservasAnteriores
-                .map(reserva => crearFilaReserva(reserva))
-                .join("");
+      // Rellenar la tabla de reservas anteriores
+      tbodyAnteriores.innerHTML = reservasAnteriores
+        .map((reserva) => crearFilaReserva(reserva))
+        .join("");
 
-            // Rellenar la tabla de reservas actuales o futuras
-            tbodyFuturas.innerHTML = reservasFuturas
-                .map(reserva => crearFilaReserva(reserva))
-                .join("");
+      // Rellenar la tabla de reservas actuales o futuras
+      tbodyFuturas.innerHTML = reservasFuturas
+        .map((reserva) => crearFilaReserva(reserva))
+        .join("");
 
-            // Añadir eventos de copia a los botones
-            document.querySelectorAll('.copy-link-btn').forEach(button => {
-                button.addEventListener('click', function () {
-                    const id = this.getAttribute('data-id');
-                    const link = `http://185.253.154.145:3002/api/usuario/${id}`;
-                    console.log(`Copiando enlace: ${link}`); // Debugging
-                    copiarAlPortapapeles(link);
-                });
-            });
-        } else {
-            document.getElementById("msg").textContent = "Error al cargar las reservas.";
-        }
-    } catch (error) {
-        document.getElementById("msg").textContent = "Error de conexión.";
+      // Añadir eventos de copia a los botones
+      document.querySelectorAll(".copy-link-btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          const id = this.getAttribute("data-id");
+          const link = `http://185.253.154.145:3002/api/usuario/${id}`;
+          console.log(`Copiando enlace: ${link}`); // Debugging
+          copiarAlPortapapeles(link);
+        });
+      });
+    } else {
+      document.getElementById("msg").textContent =
+        "Error al cargar las reservas.";
     }
+  } catch (error) {
+    document.getElementById("msg").textContent = "Error de conexión.";
+  }
 });
 
 // Crear la fila de la reserva en la tabla
 function crearFilaReserva(reserva) {
-    return `
+  return `
         <tr>
             <td>${reserva.nombre}</td>
             <td>${reserva.apellido}</td>
@@ -59,18 +68,28 @@ function crearFilaReserva(reserva) {
 
 // Función para copiar al portapapeles
 function copiarAlPortapapeles(texto) {
-    // Verificar si la API está disponible
-    if (!navigator.clipboard) {
-        console.error("La API del portapapeles no está disponible.");
-        alert('La función de copiar no es compatible con este navegador.');
-        return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    // Usa la API del portapapeles si está disponible
+    navigator.clipboard
+      .writeText(texto)
+      .then(() => {
+        alert("Enlace copiado al portapapeles: " + texto);
+      })
+      .catch((err) => {
+        alert("Error al copiar el enlace: " + err);
+      });
+  } else {
+    // Método alternativo si la API no está disponible
+    const textArea = document.createElement("textarea");
+    textArea.value = texto;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand("copy");
+      alert("Enlace copiado al portapapeles: " + texto);
+    } catch (err) {
+      alert("Error al copiar el enlace: " + err);
     }
-
-    navigator.clipboard.writeText(texto).then(() => {
-        console.log('Enlace copiado al portapapeles: ' + texto); // Debugging
-        alert('Enlace copiado al portapapeles: ' + texto);
-    }).catch(err => {
-        console.error('Error al copiar el enlace:', err); // Debugging
-        alert('Error al copiar el enlace: ' + err);
-    });
+    document.body.removeChild(textArea);
+  }
 }
