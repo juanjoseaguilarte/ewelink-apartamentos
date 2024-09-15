@@ -160,7 +160,7 @@ app.get("/api/toggle-device", async (req, res) => {
     // Verificar si la fecha actual está entre las fechas de entrada y salida del usuario
     if (fechaActual >= fechaEntrada && fechaActual <= fechaSalida) {
       // Verificar si la hora actual está dentro del horario permitido
-
+      console.log("he pasado")
       // Crear objetos de tiempo para comparar las horas
       const [horaEntradaHoras, horaEntradaMinutos] =
         user.hora_entrada.split(":");
