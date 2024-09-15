@@ -49,12 +49,12 @@ function displayUserInfo(user) {
 // Función para abrir la puerta
 async function openDoor(userId) {
     const msgDiv = document.getElementById("msg");
-
     try {
         const response = await fetch(`http://185.253.154.145:3002/api/toggle-device?userId=${userId}`);
         if (response.ok) {
             msgDiv.textContent = "Puerta abierta exitosamente.";
         } else {
+            console.log(response)
             msgDiv.textContent = "No se pudo abrir la puerta. " + await response.text();
         }
     } catch (error) {
