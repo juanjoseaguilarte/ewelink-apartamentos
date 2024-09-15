@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             <p><strong>Fecha de Entrada:</strong> ${user.fecha_entrada} ${user.hora_entrada}</p>
             <p><strong>Fecha de Salida:</strong> ${user.fecha_salida} ${user.hora_salida}</p>
             <p><strong>Intentos:</strong> ${user.intentos}</p>
+            <p><strong>PIN Caja:</strong> ${user.pin}</p>
           `;
   
         // Comprobar si las fechas están en curso

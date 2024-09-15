@@ -11,6 +11,7 @@ document.getElementById("userForm").addEventListener("submit", async function (e
     const hora_entrada = document.getElementById("hora_entrada").value || "16:00";
     const hora_salida = document.getElementById("hora_salida").value || "12:00";
     const intentos = document.getElementById("intentos").value || 5;
+    const pin = document.getElementById("pin").value; // Nuevo campo PIN
 
     const user = {
         nombre,
@@ -20,6 +21,7 @@ document.getElementById("userForm").addEventListener("submit", async function (e
         intentos,
         hora_entrada,
         hora_salida,
+        pin // Añadir el campo pin al objeto user
     };
 
     try {

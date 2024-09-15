@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const hora_entrada = document.getElementById("hora_entrada").value;
         const hora_salida = document.getElementById("hora_salida").value;
         const intentos = document.getElementById("intentos").value;
+        const pin = document.getElementById("pin").value;
 
         const updatedReserva = {
             nombre,
@@ -55,6 +56,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             hora_entrada,
             hora_salida,
             intentos,
+            pin
         };
 
         try {
