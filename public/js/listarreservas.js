@@ -14,10 +14,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       );
 
       const reservasAnteriores = reservas.filter(
-        (reserva) => reserva.fecha_salida < fechaActual
+        (reserva) => reserva.fecha_salida <= fechaActual
       );
       const reservasFuturas = reservas.filter(
-        (reserva) => reserva.fecha_salida >= fechaActual
+        (reserva) => reserva.fecha_salida > fechaActual
       );
 
       // Rellenar la tabla de reservas anteriores

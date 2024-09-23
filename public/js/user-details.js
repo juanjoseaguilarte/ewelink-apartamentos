@@ -57,8 +57,19 @@ function displayUserInfo(user) {
     const formattedFechaEntrada = formatDate(user.fecha_entrada);
     const formattedFechaSalida = formatDate(user.fecha_salida);
 
-    // Mostrar el PIN de forma destacada
-    userPinDiv.textContent = `Pin Caja Seguridad: ${user.pin}`;
+    // Verificar si el usuario está dentro de los horarios permitidos
+    const isWithinAllowedTime = checkAllowedTime(user.fecha_entrada, user.fecha_salida, user.hora_entrada, user.hora_salida);
+
+    // Mostrar o difuminar el PIN según la lógica de tiempo permitido
+    if (isWithinAllowedTime) {
+        userPinDiv.textContent = `Pin Caja Seguridad: ${user.pin}`;
+        userPinDiv.classList.remove('blurred'); // Remueve la clase difuminada
+        openDoorButton.disabled = false; // Habilitar el botón
+    } else {
+        userPinDiv.textContent = `Pin Caja Seguridad: ****`;
+        userPinDiv.classList.add('blurred'); // Agrega la clase difuminada
+        openDoorButton.disabled = true; // Deshabilitar el botón
+    }
 
     // Actualizar la información sobre los intentos
     attemptsParagraph.textContent = `Tiene ${user.intentos} intentos para abrir la puerta principal. Suba el ascensor a la tercera planta, y gire a la derecha, es la primera puerta. Se encontrará una cajita de seguridad, introduzca el código que le aparece.`;
@@ -96,4 +107,20 @@ async function openDoor(userId) {
     } catch (error) {
         msgDiv.textContent = "Error al conectar con el servidor.";
     }
+}
+
+// Función para comprobar si el usuario está dentro de los días y horarios permitidos
+function checkAllowedTime(fechaEntrada, fechaSalida, horaEntrada, horaSalida) {
+    const currentDate = new Date();
+    const currentDayTime = currentDate.getTime();
+    
+    // Convertir fechas y horas de entrada/salida a objetos Date
+    const entradaDateTime = new Date(fechaEntrada + ' ' + horaEntrada).getTime();
+    const salidaDateTime = new Date(fechaSalida + ' ' + horaSalida).getTime();
+
+    // Verificar si la fecha actual está dentro del rango de entrada/salida
+    if (currentDayTime >= entradaDateTime && currentDayTime <= salidaDateTime) {
+        return true;
+    }
+    return false;
 }

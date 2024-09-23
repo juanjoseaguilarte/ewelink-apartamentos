@@ -183,3 +183,15 @@ button:hover {
 p {
   margin: 10px 0;
 }
+
+/* Difuminar el PIN cuando se aplique la clase 'blurred' */
+.blurred {
+    filter: blur(5px);
+    opacity: 0.6;
+}
+
+/* Estilo para el botón deshabilitado */
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
