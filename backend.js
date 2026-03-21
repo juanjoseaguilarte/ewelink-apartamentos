@@ -23,8 +23,14 @@ app.use(
 // Servir archivos estáticos del frontend desde la carpeta 'public'
 app.use(express.static("public"));
 
+// Asegurar que el directorio data existe
+const fs = require("fs");
+if (!fs.existsSync("./data")) {
+  fs.mkdirSync("./data");
+}
+
 // Conectar a la base de datos SQLite (o crearla si no existe)
-const db = new sqlite3.Database("./usuarios.db", (err) => {
+const db = new sqlite3.Database("./data/usuarios.db", (err) => {
   if (err) {
     console.error("Error al abrir la base de datos:", err.message);
   } else {
