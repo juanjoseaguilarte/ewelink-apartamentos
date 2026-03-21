@@ -20,8 +20,10 @@ app.use(
   })
 );
 
-// Servir archivos estáticos del frontend desde la carpeta 'public'
-app.use(express.static("public"));
+// Servir el frontend React compilado
+const path = require("path");
+const FRONTEND_DIST = path.join(__dirname, "frontend", "dist");
+app.use(express.static(FRONTEND_DIST));
 
 // Asegurar que el directorio data existe
 const fs = require("fs");
@@ -275,9 +277,9 @@ app.delete("/api/usuario/:id", (req, res) => {
     res.status(200).send("Reserva eliminada correctamente");
   });
 });
-// Manejo de rutas 404
-app.use((req, res) => {
-  res.status(404).send("Página no encontrada");
+// Fallback SPA — todas las rutas no-API devuelven el index.html de React
+app.get("*", (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIST, "index.html"));
 });
 
 // Iniciar el servidor
