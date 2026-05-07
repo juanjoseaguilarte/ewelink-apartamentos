@@ -1,126 +1,111 @@
 // user-details.js
 document.addEventListener("DOMContentLoaded", async function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const userId = urlParams.get("id");
-    const userInfoDiv = document.getElementById("userInfo");
-    const msgDiv = document.getElementById("msg");
-    const openDoorButton = document.getElementById("openDoorButton");
-    const attemptsParagraph = document.getElementById("attemptsInfo");
+  const urlParams = new URLSearchParams(window.location.search);
+  const userId = urlParams.get("id");
+  const msgDiv = document.getElementById("msg");
+  const openDoorButton = document.getElementById("openDoorButton");
 
-    if (!userId) {
-        msgDiv.textContent = "No se proporcionó un ID de usuario.";
-        return;
-    }
+  if (!userId) {
+    msgDiv.textContent = "No se proporcionó un ID de usuario.";
+    return;
+  }
 
-    try {
-        // Obtener datos del usuario por ID
-        await fetchUserData(userId);
+  try {
+    await fetchUserData(userId);
 
-        // Configurar el botón para abrir la puerta
-        openDoorButton.addEventListener("click", async function () {
-            // Mostrar alerta de confirmación
-            const confirmAction = confirm("¿Está seguro de que desea abrir la puerta? Esto restará un intento.");
-            if (confirmAction) {
-                await openDoor(userId);
-                // Recargar los datos del usuario después de abrir la puerta
-                await fetchUserData(userId);
-            }
-        });
-    } catch (error) {
-        msgDiv.textContent = "Error al conectar con el servidor.";
-    }
+    openDoorButton.addEventListener("click", async function () {
+      const confirmAction = confirm("¿Está seguro de que desea abrir la puerta? Esto restará un intento.");
+      if (!confirmAction) return;
+
+      const originalText = openDoorButton.textContent;
+      openDoorButton.disabled = true;
+      openDoorButton.textContent = "Abriendo...";
+
+      await openDoor(userId);
+      await fetchUserData(userId);
+
+      openDoorButton.disabled = false;
+      openDoorButton.textContent = originalText;
+    });
+  } catch {
+    msgDiv.textContent = "Error al conectar con el servidor.";
+  }
 });
 
-// Función para obtener los datos del usuario por ID
 async function fetchUserData(userId) {
-    const msgDiv = document.getElementById("msg");
-    try {
-        const response = await fetch(`/api/usuario/${userId}`);
-        if (response.ok) {
-            const user = await response.json();
-            displayUserInfo(user);
-        } else {
-            msgDiv.textContent = "Usuario no encontrado.";
-        }
-    } catch (error) {
-        msgDiv.textContent = "Error al conectar con el servidor.";
-    }
-}
-
-// Mostrar los datos del usuario
-function displayUserInfo(user) {
-    const userPinDiv = document.getElementById("userPin");
-    const userInfoDiv = document.getElementById("userInfo");
-    const attemptsParagraph = document.getElementById("attemptsInfo");
-
-    // Formatear fechas
-    const formattedFechaEntrada = formatDate(user.fecha_entrada);
-    const formattedFechaSalida = formatDate(user.fecha_salida);
-
-    // Verificar si el usuario está dentro de los horarios permitidos
-    const isWithinAllowedTime = checkAllowedTime(user.fecha_entrada, user.fecha_salida, user.hora_entrada, user.hora_salida);
-
-    // Mostrar o difuminar el PIN según la lógica de tiempo permitido
-    if (isWithinAllowedTime) {
-        userPinDiv.textContent = `Pin Caja Seguridad: ${user.pin}`;
-        userPinDiv.classList.remove('blurred'); // Remueve la clase difuminada
-        openDoorButton.disabled = false; // Habilitar el botón
+  const msgDiv = document.getElementById("msg");
+  try {
+    const response = await fetch(`/api/usuario/${userId}`);
+    if (response.ok) {
+      const user = await response.json();
+      displayUserInfo(user);
     } else {
-        userPinDiv.textContent = `Pin Caja Seguridad: ****`;
-        userPinDiv.classList.add('blurred'); // Agrega la clase difuminada
-        openDoorButton.disabled = true; // Deshabilitar el botón
+      msgDiv.textContent = "Usuario no encontrado.";
     }
-
-    // Actualizar la información sobre los intentos
-    attemptsParagraph.textContent = `Tiene ${user.intentos} intentos para abrir la puerta principal. Suba el ascensor a la tercera planta, y gire a la derecha, es la primera puerta. Se encontrará una cajita de seguridad, introduzca el código que le aparece.`;
-
-    // Crear la estructura de información del usuario
-    userInfoDiv.innerHTML = `
-        <p><strong>Nombre:</strong> ${user.nombre}</p>
-        <p><strong>Apellido:</strong> ${user.apellido}</p>
-        <p><strong>Fecha de Entrada:</strong> ${formattedFechaEntrada}</p>
-        <p><strong>Fecha de Salida:</strong> ${formattedFechaSalida}</p>
-        <p><strong>Hora de Entrada:</strong> ${user.hora_entrada}</p>
-        <p><strong>Hora de Salida:</strong> ${user.hora_salida}</p>
-        <p><strong>Intentos Restantes:</strong> ${user.intentos}</p>
-    `;
+  } catch {
+    msgDiv.textContent = "Error al conectar con el servidor.";
+  }
 }
 
-// Función para formatear fechas al formato "día mes año"
+function displayUserInfo(user) {
+  const userPinDiv = document.getElementById("userPin");
+  const userInfoDiv = document.getElementById("userInfo");
+  const attemptsParagraph = document.getElementById("attemptsInfo");
+  const openDoorButton = document.getElementById("openDoorButton");
+
+  const formattedFechaEntrada = formatDate(user.fecha_entrada);
+  const formattedFechaSalida = formatDate(user.fecha_salida);
+
+  // El backend ya omite el PIN fuera de la ventana horaria
+  if (user.pin) {
+    userPinDiv.textContent = `Pin Caja Seguridad: ${user.pin}`;
+    userPinDiv.classList.remove("blurred");
+    openDoorButton.disabled = false;
+  } else {
+    userPinDiv.textContent = "Pin Caja Seguridad: ****";
+    userPinDiv.classList.add("blurred");
+    openDoorButton.disabled = true;
+  }
+
+  attemptsParagraph.textContent = `Tiene ${user.intentos} intentos para abrir la puerta principal. Suba el ascensor a la tercera planta, y gire a la derecha, es la primera puerta. Se encontrará una cajita de seguridad, introduzca el código que le aparece.`;
+
+  userInfoDiv.innerHTML = `
+    <p><strong>Nombre:</strong> ${user.nombre}</p>
+    <p><strong>Apellido:</strong> ${user.apellido}</p>
+    <p><strong>Fecha de Entrada:</strong> ${formattedFechaEntrada}</p>
+    <p><strong>Fecha de Salida:</strong> ${formattedFechaSalida}</p>
+    <p><strong>Hora de Entrada:</strong> ${user.hora_entrada}</p>
+    <p><strong>Hora de Salida:</strong> ${user.hora_salida}</p>
+    <p><strong>Intentos Restantes:</strong> ${user.intentos}</p>
+  `;
+}
+
 function formatDate(dateString) {
-    const options = { day: '2-digit', month: 'long', year: 'numeric' };
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', options);
+  const options = { day: "2-digit", month: "long", year: "numeric" };
+  return new Date(dateString).toLocaleDateString("es-ES", options);
 }
 
-// Función para abrir la puerta
 async function openDoor(userId) {
-    const msgDiv = document.getElementById("msg");
-    try {
-        const response = await fetch(`/api/toggle-device?userId=${userId}`);
-        if (response.ok) {
-            msgDiv.textContent = "Puerta abierta exitosamente.";
-        } else {
-            console.log(response);
-            msgDiv.textContent = "No se pudo abrir la puerta. " + (await response.text());
-        }
-    } catch (error) {
-        msgDiv.textContent = "Error al conectar con el servidor.";
+  const msgDiv = document.getElementById("msg");
+  try {
+    const response = await fetch(`/api/toggle-device?userId=${userId}`);
+    const data = await response.json();
+    if (response.ok) {
+      msgDiv.textContent = "Puerta abierta exitosamente.";
+      msgDiv.className = "text-success";
+    } else {
+      msgDiv.textContent = "No se pudo abrir la puerta. " + (data.error || "");
+      msgDiv.className = "text-danger";
     }
+  } catch {
+    msgDiv.textContent = "Error al conectar con el servidor.";
+    msgDiv.className = "text-danger";
+  }
 }
 
-// Función para comprobar si el usuario está dentro de los días y horarios permitidos
 function checkAllowedTime(fechaEntrada, fechaSalida, horaEntrada, horaSalida) {
-    const currentDate = new Date();
-    const currentDayTime = currentDate.getTime();
-    
-    // Convertir fechas y horas de entrada/salida a objetos Date
-    const entradaDateTime = new Date(fechaEntrada + ' ' + horaEntrada).getTime();
-    const salidaDateTime = new Date(fechaSalida + ' ' + horaSalida).getTime();
-
-    // Verificar si la fecha actual está dentro del rango de entrada/salida
-    if (currentDayTime >= entradaDateTime && currentDayTime <= salidaDateTime) {
-        return true;
-    }
-    return false;
+  const entradaDateTime = new Date(fechaEntrada + " " + horaEntrada).getTime();
+  const salidaDateTime = new Date(fechaSalida + " " + horaSalida).getTime();
+  const now = Date.now();
+  return now >= entradaDateTime && now <= salidaDateTime;
 }
