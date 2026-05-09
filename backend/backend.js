@@ -1,7 +1,7 @@
 const express = require("express");
 const ewelink = require("ewelink-api");
 const cors = require("cors");
-const sqlite3 = require("sqlite3").verbose();
+const Database = require("better-sqlite3");
 const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -21,7 +21,6 @@ app.use(
   })
 );
 
-// Limita /api/toggle-device a 5 peticiones por IP por minuto
 const toggleDeviceLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 5,
@@ -30,26 +29,21 @@ const toggleDeviceLimiter = rateLimit({
   message: { error: "Demasiadas peticiones. Espera un momento." },
 });
 
-const db = new sqlite3.Database(process.env.DB_PATH || "/data/usuarios.db", (err) => {
-  if (err) {
-    console.error("Error al abrir la base de datos:", err.message);
-  } else {
-    console.log("Conectado a la base de datos SQLite.");
-    db.run(`
-      CREATE TABLE IF NOT EXISTS usuarios (
-        id TEXT PRIMARY KEY,
-        nombre TEXT,
-        apellido TEXT,
-        fecha_entrada TEXT,
-        fecha_salida TEXT,
-        intentos INTEGER,
-        hora_entrada TEXT DEFAULT '16:00',
-        hora_salida TEXT DEFAULT '12:00',
-        pin TEXT
-      )
-    `);
-  }
-});
+const db = new Database(process.env.DB_PATH || "/data/usuarios.db");
+db.exec(`
+  CREATE TABLE IF NOT EXISTS usuarios (
+    id TEXT PRIMARY KEY,
+    nombre TEXT,
+    apellido TEXT,
+    fecha_entrada TEXT,
+    fecha_salida TEXT,
+    intentos INTEGER,
+    hora_entrada TEXT DEFAULT '16:00',
+    hora_salida TEXT DEFAULT '12:00',
+    pin TEXT
+  )
+`);
+console.log("Conectado a la base de datos SQLite.");
 
 const connection = new ewelink({
   email: process.env.EWELINK_EMAIL,
@@ -58,8 +52,6 @@ const connection = new ewelink({
   APP_ID: process.env.EWELINK_APP_ID,
   APP_SECRET: process.env.EWELINK_APP_SECRET,
 });
-
-app.get("/health", (req, res) => res.json({ status: "ok" }));
 
 // --- Auth ---
 
@@ -83,14 +75,7 @@ app.post("/api/login", async (req, res) => {
     return res.status(500).json({ error: "Variable ADMIN_PASSWORD no configurada" });
   }
 
-  // Comparación en tiempo constante para evitar timing attacks
-  const userMatch = username === adminUser;
-  const passMatch = await bcrypt.compare(password || "", await bcrypt.hash(adminPass, 10));
-  // Usamos bcrypt.compare con hash fresco para timing constante;
-  // la validación real es la comparación directa más abajo
-  const valid = userMatch && (password === adminPass);
-
-  if (!valid) {
+  if (username !== adminUser || password !== adminPass) {
     return res.status(401).json({ error: "Credenciales incorrectas" });
   }
 
@@ -102,7 +87,7 @@ app.post("/api/login", async (req, res) => {
   res.json({ token });
 });
 
-// --- Validación de reserva ---
+// --- Validación ---
 
 const TIME_REGEX = /^([01]?\d|2[0-3]):[0-5]\d$/;
 
@@ -122,7 +107,6 @@ function validateReserva({ nombre, apellido, fecha_entrada, fecha_salida, intent
   return null;
 }
 
-// Comprueba si ahora está dentro de la ventana de acceso del usuario
 function isWithinAccessWindow(user) {
   const [entH, entM] = user.hora_entrada.split(":");
   const [salH, salM] = user.hora_salida.split(":");
@@ -134,60 +118,60 @@ function isWithinAccessWindow(user) {
   return now >= entrada && now <= salida;
 }
 
+// --- Health ---
+
+app.get("/health", (req, res) => res.json({ status: "ok" }));
+
 // --- Rutas públicas (huésped) ---
 
-// Devuelve los datos del usuario; omite el PIN si está fuera de la ventana horaria
 app.get("/api/usuario/:id", (req, res) => {
-  db.get(`SELECT * FROM usuarios WHERE id = ?`, [req.params.id], (err, user) => {
-    if (err || !user) return res.status(404).json({ error: "Usuario no encontrado" });
+  try {
+    const user = db.prepare("SELECT * FROM usuarios WHERE id = ?").get(req.params.id);
+    if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
     const data = { ...user };
     if (!isWithinAccessWindow(user)) delete data.pin;
 
     res.json(data);
-  });
+  } catch {
+    res.status(500).json({ error: "Error interno" });
+  }
 });
 
 app.get("/api/toggle-device", toggleDeviceLimiter, async (req, res) => {
   const { userId } = req.query;
   if (!userId) return res.status(400).json({ error: "Falta el ID del usuario" });
 
-  db.get(`SELECT * FROM usuarios WHERE id = ?`, [userId], async (err, user) => {
-    if (err || !user) return res.status(404).json({ error: "Usuario no encontrado" });
+  try {
+    const user = db.prepare("SELECT * FROM usuarios WHERE id = ?").get(userId);
+    if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
     if (!isWithinAccessWindow(user)) {
       return res.status(403).json({ error: "Fuera de las fechas u horas permitidas" });
     }
-
     if (user.intentos <= 0) {
       return res.status(400).json({ error: "No hay intentos disponibles" });
     }
 
-    try {
-      await connection.toggleDevice(process.env.DEVICE_ID);
+    await connection.toggleDevice(process.env.DEVICE_ID);
 
-      db.run(
-        `UPDATE usuarios SET intentos = intentos - 1 WHERE id = ? AND intentos > 0`,
-        [userId],
-        (err) => {
-          if (err) return res.status(500).json({ error: "Error al actualizar los intentos" });
-          res.json({ message: "Dispositivo activado" });
-        }
-      );
-    } catch (error) {
-      console.error("Error al accionar el dispositivo:", error);
-      res.status(500).json({ error: "Error al accionar el dispositivo" });
-    }
-  });
+    db.prepare("UPDATE usuarios SET intentos = intentos - 1 WHERE id = ? AND intentos > 0").run(userId);
+    res.json({ message: "Dispositivo activado" });
+  } catch (error) {
+    console.error("Error al accionar el dispositivo:", error);
+    res.status(500).json({ error: "Error al accionar el dispositivo" });
+  }
 });
 
-// --- Rutas de admin (requieren autenticación) ---
+// --- Rutas admin (requieren auth) ---
 
 app.get("/api/usuarioall", authMiddleware, (req, res) => {
-  db.all(`SELECT * FROM usuarios`, (err, users) => {
-    if (err) return res.status(500).json({ error: "Error al obtener usuarios" });
+  try {
+    const users = db.prepare("SELECT * FROM usuarios").all();
     res.json(users);
-  });
+  } catch {
+    res.status(500).json({ error: "Error al obtener usuarios" });
+  }
 });
 
 app.post("/api/usuario", authMiddleware, (req, res) => {
@@ -201,15 +185,16 @@ app.post("/api/usuario", authMiddleware, (req, res) => {
   } = fields;
 
   const id = uuidv4();
-  db.run(
-    `INSERT INTO usuarios (id, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, nombre, apellido, fecha_entrada, fecha_salida, parseInt(intentos, 10), hora_entrada, hora_salida, pin],
-    function (err) {
-      if (err) return res.status(500).json({ error: "Error al agregar la reserva" });
-      res.status(201).json({ id, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin });
-    }
-  );
+  try {
+    db.prepare(
+      `INSERT INTO usuarios (id, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(id, nombre, apellido, fecha_entrada, fecha_salida, parseInt(intentos, 10), hora_entrada, hora_salida, pin);
+
+    res.status(201).json({ id, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin });
+  } catch {
+    res.status(500).json({ error: "Error al agregar la reserva" });
+  }
 });
 
 app.put("/api/usuario/:id", authMiddleware, (req, res) => {
@@ -223,24 +208,27 @@ app.put("/api/usuario/:id", authMiddleware, (req, res) => {
     hora_entrada = "16:00", hora_salida = "12:00",
   } = fields;
 
-  db.run(
-    `UPDATE usuarios SET nombre=?, apellido=?, fecha_entrada=?, fecha_salida=?,
-     intentos=?, hora_entrada=?, hora_salida=?, pin=? WHERE id=?`,
-    [nombre, apellido, fecha_entrada, fecha_salida, parseInt(intentos, 10), hora_entrada, hora_salida, pin, userId],
-    function (err) {
-      if (err) return res.status(500).json({ error: "Error al actualizar la reserva" });
-      if (this.changes === 0) return res.status(404).json({ error: "Reserva no encontrada" });
-      res.json({ id: userId, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin });
-    }
-  );
+  try {
+    const result = db.prepare(
+      `UPDATE usuarios SET nombre=?, apellido=?, fecha_entrada=?, fecha_salida=?,
+       intentos=?, hora_entrada=?, hora_salida=?, pin=? WHERE id=?`
+    ).run(nombre, apellido, fecha_entrada, fecha_salida, parseInt(intentos, 10), hora_entrada, hora_salida, pin, userId);
+
+    if (result.changes === 0) return res.status(404).json({ error: "Reserva no encontrada" });
+    res.json({ id: userId, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin });
+  } catch {
+    res.status(500).json({ error: "Error al actualizar la reserva" });
+  }
 });
 
 app.delete("/api/usuario/:id", authMiddleware, (req, res) => {
-  db.run(`DELETE FROM usuarios WHERE id = ?`, [req.params.id], function (err) {
-    if (err) return res.status(500).json({ error: "Error al eliminar la reserva" });
-    if (this.changes === 0) return res.status(404).json({ error: "Reserva no encontrada" });
+  try {
+    const result = db.prepare("DELETE FROM usuarios WHERE id = ?").run(req.params.id);
+    if (result.changes === 0) return res.status(404).json({ error: "Reserva no encontrada" });
     res.json({ message: "Reserva eliminada correctamente" });
-  });
+  } catch {
+    res.status(500).json({ error: "Error al eliminar la reserva" });
+  }
 });
 
 app.use((req, res) => {
