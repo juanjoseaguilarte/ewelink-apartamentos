@@ -3,3 +3,11 @@
 *.env.local
 *.env.*.local
 *.db
+
+# Archivos legacy en la raíz (movidos a backend/ y frontend/)
+/backend.js
+/insertar_datos_ficticios.js
+/package.json
+/package-lock.json
+/node_modules/
+/public/
