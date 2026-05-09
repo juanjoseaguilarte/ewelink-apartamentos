@@ -1,0 +1,10 @@
+{
+	admin off
+}
+
+:80 {
+	root * /srv
+	file_server
+
+	reverse_proxy /api/* {$BACKEND_URL}
+}
