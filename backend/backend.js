@@ -59,6 +59,8 @@ const connection = new ewelink({
   APP_SECRET: process.env.EWELINK_APP_SECRET,
 });
 
+app.get("/health", (req, res) => res.json({ status: "ok" }));
+
 // --- Auth ---
 
 function authMiddleware(req, res, next) {
