@@ -1,10 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import ReservaForm, { ReservaFields } from "../ReservaForm";
+import { useEffect, useState } from "react";
+import ReservaForm, { ReservaFields, Propiedad } from "../ReservaForm";
 import { authFetch } from "@/lib/auth";
 
 export default function NuevaReservaPage() {
+  const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
+
+  useEffect(() => {
+    authFetch("/api/system/propiedades").then((r) => r.ok ? r.json() : []).then(setPropiedades).catch(() => {});
+  }, []);
+
   async function handleSubmit(fields: ReservaFields) {
     const res = await authFetch("/api/usuario", {
       method: "POST",
@@ -24,6 +31,7 @@ export default function NuevaReservaPage() {
         onSubmit={handleSubmit}
         submitLabel="Crear reserva"
         successMsg="Reserva creada correctamente"
+        propiedades={propiedades}
       />
     </div>
   );

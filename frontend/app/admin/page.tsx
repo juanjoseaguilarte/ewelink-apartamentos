@@ -16,7 +16,10 @@ type Reserva = {
   hora_salida: string;
   intentos: number;
   pin: string;
+  property_id?: string | null;
 };
+
+type Propiedad = { id: string; nombre: string };
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" });
@@ -33,24 +36,27 @@ function copyGuestLink(id: string) {
 export default function AdminPage() {
   const router = useRouter();
   const [reservas, setReservas] = useState<Reserva[]>([]);
+  const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
 
   async function load() {
     setLoading(true);
     try {
-      const res = await authFetch("/api/usuarioall");
-      if (res.ok) {
-        setReservas(await res.json());
-      } else {
-        const d = await res.json();
-        setMsg(d.error ?? "Error al cargar reservas");
-      }
+      const [resRes, propsRes] = await Promise.all([
+        authFetch("/api/usuarioall"),
+        authFetch("/api/system/propiedades"),
+      ]);
+      if (resRes.ok) setReservas(await resRes.json());
+      else { const d = await resRes.json(); setMsg(d.error ?? "Error al cargar reservas"); }
+      if (propsRes.ok) setPropiedades(await propsRes.json());
     } catch {
       setMsg("Error de conexión");
     }
     setLoading(false);
   }
+
+  const propName = (id?: string | null) => id ? (propiedades.find((p) => p.id === id)?.nombre ?? null) : null;
 
   useEffect(() => { load(); }, []);
 
@@ -84,20 +90,21 @@ export default function AdminPage() {
         </Link>
       </div>
 
-      <Section title="Reservas actuales y futuras" reservas={futuras} onDelete={handleDelete} onCopy={copyGuestLink} router={router} />
-      <Section title="Reservas anteriores" reservas={pasadas} onDelete={handleDelete} onCopy={copyGuestLink} router={router} />
+      <Section title="Reservas actuales y futuras" reservas={futuras} onDelete={handleDelete} onCopy={copyGuestLink} router={router} propName={propName} />
+      <Section title="Reservas anteriores" reservas={pasadas} onDelete={handleDelete} onCopy={copyGuestLink} router={router} propName={propName} />
     </div>
   );
 }
 
 function Section({
-  title, reservas, onDelete, onCopy, router,
+  title, reservas, onDelete, onCopy, router, propName,
 }: {
   title: string;
   reservas: Reserva[];
   onDelete: (id: string) => void;
   onCopy: (id: string) => void;
   router: ReturnType<typeof useRouter>;
+  propName: (id?: string | null) => string | null;
 }) {
   return (
     <div>
@@ -110,6 +117,9 @@ function Section({
             <div key={r.id} className="bg-white rounded-xl shadow-sm p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="space-y-0.5">
                 <p className="font-semibold text-gray-800">{r.nombre} {r.apellido}</p>
+                {propName(r.property_id) && (
+                  <p className="text-xs text-indigo-600 font-medium">{propName(r.property_id)}</p>
+                )}
                 <p className="text-sm text-gray-500">
                   {formatDate(r.fecha_entrada)} ({r.hora_entrada}) → {formatDate(r.fecha_salida)} ({r.hora_salida})
                 </p>

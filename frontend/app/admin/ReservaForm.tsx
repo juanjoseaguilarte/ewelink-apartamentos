@@ -11,6 +11,7 @@ export type ReservaFields = {
   hora_salida: string;
   intentos: string;
   pin: string;
+  property_id: string;
 };
 
 export const defaultFields: ReservaFields = {
@@ -22,13 +23,17 @@ export const defaultFields: ReservaFields = {
   hora_salida: "12:00",
   intentos: "5",
   pin: "",
+  property_id: "",
 };
+
+export type Propiedad = { id: string; nombre: string; direccion: string };
 
 type Props = {
   initial?: Partial<ReservaFields>;
   onSubmit: (fields: ReservaFields) => Promise<{ ok: boolean; error?: string }>;
   submitLabel: string;
   successMsg: string;
+  propiedades?: Propiedad[];
 };
 
 function Field({
@@ -55,7 +60,7 @@ function Field({
   );
 }
 
-export default function ReservaForm({ initial = {}, onSubmit, submitLabel, successMsg }: Props) {
+export default function ReservaForm({ initial = {}, onSubmit, submitLabel, successMsg, propiedades }: Props) {
   const [fields, setFields] = useState<ReservaFields>({ ...defaultFields, ...initial });
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
@@ -98,6 +103,21 @@ export default function ReservaForm({ initial = {}, onSubmit, submitLabel, succe
         <Field label="Intentos" name="intentos" type="number" min="1" max="100" value={fields.intentos} onChange={set("intentos")} />
         <Field label="PIN caja fuerte" name="pin" value={fields.pin} onChange={set("pin")} placeholder="ej. 1234" />
       </div>
+      {propiedades && propiedades.length > 0 && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Propiedad</label>
+          <select
+            value={fields.property_id}
+            onChange={(e) => setFields((f) => ({ ...f, property_id: e.target.value }))}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">— Sin asignar —</option>
+            {propiedades.map((p) => (
+              <option key={p.id} value={p.id}>{p.nombre}{p.direccion ? ` · ${p.direccion}` : ""}</option>
+            ))}
+          </select>
+        </div>
+      )}
       {msg && (
         <p className={`text-sm font-medium ${msgOk ? "text-green-600" : "text-red-600"}`}>{msg}</p>
       )}

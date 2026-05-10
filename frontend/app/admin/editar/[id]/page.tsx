@@ -3,32 +3,35 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import ReservaForm, { ReservaFields } from "../../ReservaForm";
+import ReservaForm, { ReservaFields, Propiedad } from "../../ReservaForm";
 import { authFetch } from "@/lib/auth";
 
 export default function EditarReservaPage() {
   const params = useParams();
   const id = params?.id as string;
   const [initial, setInitial] = useState<Partial<ReservaFields> | null>(null);
+  const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    authFetch(`/api/usuario/${id}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) { setError(data.error); return; }
-        setInitial({
-          nombre: data.nombre ?? "",
-          apellido: data.apellido ?? "",
-          fecha_entrada: data.fecha_entrada ?? "",
-          fecha_salida: data.fecha_salida ?? "",
-          hora_entrada: data.hora_entrada ?? "16:00",
-          hora_salida: data.hora_salida ?? "12:00",
-          intentos: String(data.intentos ?? 5),
-          pin: data.pin ?? "",
-        });
-      })
-      .catch(() => setError("Error de conexión"));
+    Promise.all([
+      authFetch(`/api/usuario/${id}`).then((r) => r.json()),
+      authFetch("/api/system/propiedades").then((r) => r.ok ? r.json() : []).catch(() => []),
+    ]).then(([data, props]) => {
+      if (data.error) { setError(data.error); return; }
+      setInitial({
+        nombre: data.nombre ?? "",
+        apellido: data.apellido ?? "",
+        fecha_entrada: data.fecha_entrada ?? "",
+        fecha_salida: data.fecha_salida ?? "",
+        hora_entrada: data.hora_entrada ?? "16:00",
+        hora_salida: data.hora_salida ?? "12:00",
+        intentos: String(data.intentos ?? 5),
+        pin: data.pin ?? "",
+        property_id: data.property_id ?? "",
+      });
+      setPropiedades(props);
+    }).catch(() => setError("Error de conexión"));
   }, [id]);
 
   async function handleSubmit(fields: ReservaFields) {
@@ -54,6 +57,7 @@ export default function EditarReservaPage() {
           onSubmit={handleSubmit}
           submitLabel="Guardar cambios"
           successMsg="Reserva actualizada correctamente"
+          propiedades={propiedades}
         />
       )}
     </div>

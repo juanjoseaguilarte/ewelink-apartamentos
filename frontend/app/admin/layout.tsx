@@ -54,6 +54,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-4 flex-wrap">
             {can("reservas_ver") && navLink("/admin", "Reservas")}
             {can("reservas_crear") && navLink("/admin/nueva", "Nueva reserva")}
+            {can("limpieza_ver") && navLink("/admin/limpieza", "Limpieza")}
+            {isAdmin && navLink("/admin/propiedades", "Propiedades")}
             {isAdmin && navLink("/admin/dashboard", "Usuarios")}
           </div>
           <div className="flex items-center gap-3">
