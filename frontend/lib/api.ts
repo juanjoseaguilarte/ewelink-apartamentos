@@ -37,3 +37,10 @@ export const updateSystemUser = (id: string, data: object, token: string) =>
   request(`/api/system/users/${id}`, { method: "PUT", body: JSON.stringify(data), headers: auth(token) });
 export const deleteSystemUser = (id: string, token: string) =>
   request(`/api/system/users/${id}`, { method: "DELETE", headers: auth(token) });
+
+export const changePassword = (currentPassword: string, newPassword: string, token: string) =>
+  request("/api/change-password", {
+    method: "POST",
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+    headers: auth(token),
+  });

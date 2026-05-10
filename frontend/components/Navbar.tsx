@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { removeToken, getUserInfo, isAdmin, hasPerm } from "@/lib/auth";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const user = getUserInfo();
+  const { t } = useTranslation();
 
   function logout() {
     removeToken();
@@ -25,22 +28,23 @@ export default function Navbar() {
         <div className="flex gap-5 items-center">
           <span className="font-bold text-white text-base">Rentalsur</span>
           {hasPerm("reservas_ver") && (
-            <Link href="/admin" className={linkClass("/admin")}>Reservas</Link>
+            <Link href="/admin" className={linkClass("/admin")}>{t("nav.reservas")}</Link>
           )}
           {hasPerm("mensajes_ver") && (
-            <Link href="/mensajes" className={linkClass("/mensajes")}>Mensajes</Link>
+            <Link href="/mensajes" className={linkClass("/mensajes")}>{t("nav.mensajes")}</Link>
           )}
           {hasPerm("mantenimiento_ver") && (
-            <Link href="/mantenimiento" className={linkClass("/mantenimiento")}>Mantenimiento</Link>
+            <Link href="/mantenimiento" className={linkClass("/mantenimiento")}>{t("nav.mantenimiento")}</Link>
           )}
           {hasPerm("limpieza_ver") && (
-            <Link href="/limpieza" className={linkClass("/limpieza")}>Limpieza</Link>
+            <Link href="/limpieza" className={linkClass("/limpieza")}>{t("nav.limpieza")}</Link>
           )}
           {isAdmin() && (
-            <Link href="/dashboard" className={linkClass("/dashboard")}>Dashboard</Link>
+            <Link href="/dashboard" className={linkClass("/dashboard")}>{t("nav.dashboard")}</Link>
           )}
         </div>
         <div className="flex items-center gap-3">
+          <LanguageSwitcher />
           <span className="text-blue-200 text-xs hidden sm:block">
             {user?.nombre} · <span className="capitalize">{user?.role}</span>
           </span>
@@ -48,7 +52,7 @@ export default function Navbar() {
             onClick={logout}
             className="text-sm bg-white text-blue-600 px-3 py-1 rounded hover:bg-blue-50 transition-colors font-medium"
           >
-            Salir
+            {t("nav.logout")}
           </button>
         </div>
       </div>

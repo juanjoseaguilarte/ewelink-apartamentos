@@ -1,0 +1,128 @@
+{
+  "nav": {
+    "reservas": "Bookings",
+    "mensajes": "Messages",
+    "mantenimiento": "Maintenance",
+    "limpieza": "Cleaning",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "Rentalsur",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in",
+    "loading": "Signing in...",
+    "error_connection": "Connection error",
+    "error_credentials": "Invalid credentials"
+  },
+  "change_password": {
+    "title": "Change password",
+    "subtitle": "For security reasons you must set a new password before continuing.",
+    "current": "Current password",
+    "new": "New password",
+    "confirm": "Confirm password",
+    "submit": "Change password",
+    "loading": "Saving...",
+    "error_match": "Passwords do not match",
+    "error_length": "Minimum 6 characters",
+    "success": "Password changed successfully"
+  },
+  "dashboard": {
+    "title": "User dashboard",
+    "new_user": "+ New user",
+    "users_list": "System users",
+    "permissions": "Permissions",
+    "admin_all_perms": "Admin has all permissions",
+    "admin_full_access": "Administrators have full system access.",
+    "select_user": "Select a user to edit their permissions",
+    "save": "Save permissions",
+    "saving": "Saving...",
+    "saved": "Permissions saved",
+    "delete_confirm": "Delete user"
+  },
+  "create_user": {
+    "title": "New user",
+    "name": "Name",
+    "username": "Username",
+    "password": "Password",
+    "role": "Role",
+    "submit": "Create user",
+    "loading": "Creating...",
+    "cancel": "Cancel",
+    "error_connection": "Connection error"
+  },
+  "perms": {
+    "reservas_ver": "View bookings",
+    "reservas_crear": "Create bookings",
+    "reservas_editar": "Edit bookings",
+    "reservas_eliminar": "Delete bookings",
+    "mensajes_ver": "View messages",
+    "mensajes_enviar": "Send messages",
+    "mantenimiento_ver": "View incidents",
+    "mantenimiento_gestionar": "Manage incidents",
+    "limpieza_ver": "View tasks",
+    "limpieza_gestionar": "Manage tasks"
+  },
+  "roles": {
+    "admin": "Admin",
+    "encargado": "Manager",
+    "mensajes": "Messages",
+    "mantenimiento": "Maintenance",
+    "limpiadora": "Cleaner"
+  },
+  "reservas": {
+    "title": "Bookings",
+    "upcoming": "Upcoming & current",
+    "past": "Past",
+    "new": "New booking",
+    "no_upcoming": "No upcoming bookings",
+    "no_past": "No past bookings",
+    "entry": "Check-in",
+    "exit": "Check-out",
+    "pin": "PIN",
+    "attempts": "Attempts",
+    "loading": "Loading...",
+    "edit": "Edit",
+    "delete": "Delete",
+    "delete_confirm": "Delete booking for",
+    "guest_link": "Guest link"
+  },
+  "form": {
+    "name": "First name",
+    "surname": "Last name",
+    "entry_date": "Check-in date",
+    "exit_date": "Check-out date",
+    "entry_time": "Check-in time",
+    "exit_time": "Check-out time",
+    "attempts": "Attempts",
+    "pin": "PIN (4-6 digits)",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "create": "Create booking",
+    "edit_title": "Edit booking",
+    "new_title": "New booking"
+  },
+  "modules": {
+    "mensajes": "Messages",
+    "mantenimiento": "Maintenance",
+    "limpieza": "Cleaning",
+    "coming_soon": "coming soon"
+  },
+  "guest": {
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "not_found": "Booking not found",
+    "check_in": "Check-in",
+    "check_out": "Check-out",
+    "your_pin": "Your access PIN",
+    "open_door": "Open door",
+    "opening": "Opening...",
+    "no_access": "Access unavailable",
+    "outside_window": "Access is only available during your stay.",
+    "attempts_left": "attempts left",
+    "no_attempts": "No attempts available",
+    "error": "Error opening the door"
+  }
+}

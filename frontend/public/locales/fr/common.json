@@ -1,0 +1,128 @@
+{
+  "nav": {
+    "reservas": "Réservations",
+    "mensajes": "Messages",
+    "mantenimiento": "Maintenance",
+    "limpieza": "Nettoyage",
+    "dashboard": "Tableau de bord",
+    "logout": "Déconnexion"
+  },
+  "login": {
+    "title": "Rentalsur",
+    "username": "Identifiant",
+    "password": "Mot de passe",
+    "submit": "Se connecter",
+    "loading": "Connexion...",
+    "error_connection": "Erreur de connexion",
+    "error_credentials": "Identifiants incorrects"
+  },
+  "change_password": {
+    "title": "Changer le mot de passe",
+    "subtitle": "Pour des raisons de sécurité, vous devez définir un nouveau mot de passe avant de continuer.",
+    "current": "Mot de passe actuel",
+    "new": "Nouveau mot de passe",
+    "confirm": "Confirmer le mot de passe",
+    "submit": "Changer le mot de passe",
+    "loading": "Enregistrement...",
+    "error_match": "Les mots de passe ne correspondent pas",
+    "error_length": "Minimum 6 caractères",
+    "success": "Mot de passe changé avec succès"
+  },
+  "dashboard": {
+    "title": "Tableau de bord utilisateurs",
+    "new_user": "+ Nouvel utilisateur",
+    "users_list": "Utilisateurs système",
+    "permissions": "Permissions",
+    "admin_all_perms": "L'admin a toutes les permissions",
+    "admin_full_access": "Les administrateurs ont un accès total au système.",
+    "select_user": "Sélectionnez un utilisateur pour modifier ses permissions",
+    "save": "Enregistrer les permissions",
+    "saving": "Enregistrement...",
+    "saved": "Permissions enregistrées",
+    "delete_confirm": "Supprimer l'utilisateur"
+  },
+  "create_user": {
+    "title": "Nouvel utilisateur",
+    "name": "Nom",
+    "username": "Identifiant",
+    "password": "Mot de passe",
+    "role": "Rôle",
+    "submit": "Créer l'utilisateur",
+    "loading": "Création...",
+    "cancel": "Annuler",
+    "error_connection": "Erreur de connexion"
+  },
+  "perms": {
+    "reservas_ver": "Voir réservations",
+    "reservas_crear": "Créer réservations",
+    "reservas_editar": "Modifier réservations",
+    "reservas_eliminar": "Supprimer réservations",
+    "mensajes_ver": "Voir messages",
+    "mensajes_enviar": "Envoyer messages",
+    "mantenimiento_ver": "Voir incidents",
+    "mantenimiento_gestionar": "Gérer incidents",
+    "limpieza_ver": "Voir tâches",
+    "limpieza_gestionar": "Gérer tâches"
+  },
+  "roles": {
+    "admin": "Admin",
+    "encargado": "Responsable",
+    "mensajes": "Messages",
+    "mantenimiento": "Maintenance",
+    "limpiadora": "Agent de nettoyage"
+  },
+  "reservas": {
+    "title": "Réservations",
+    "upcoming": "À venir et en cours",
+    "past": "Passées",
+    "new": "Nouvelle réservation",
+    "no_upcoming": "Aucune réservation à venir",
+    "no_past": "Aucune réservation passée",
+    "entry": "Arrivée",
+    "exit": "Départ",
+    "pin": "PIN",
+    "attempts": "Tentatives",
+    "loading": "Chargement...",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "delete_confirm": "Supprimer la réservation de",
+    "guest_link": "Lien client"
+  },
+  "form": {
+    "name": "Prénom",
+    "surname": "Nom de famille",
+    "entry_date": "Date d'arrivée",
+    "exit_date": "Date de départ",
+    "entry_time": "Heure d'arrivée",
+    "exit_time": "Heure de départ",
+    "attempts": "Tentatives",
+    "pin": "PIN (4-6 chiffres)",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "cancel": "Annuler",
+    "create": "Créer réservation",
+    "edit_title": "Modifier réservation",
+    "new_title": "Nouvelle réservation"
+  },
+  "modules": {
+    "mensajes": "Messages",
+    "mantenimiento": "Maintenance",
+    "limpieza": "Nettoyage",
+    "coming_soon": "bientôt disponible"
+  },
+  "guest": {
+    "welcome": "Bienvenue",
+    "loading": "Chargement...",
+    "not_found": "Réservation introuvable",
+    "check_in": "Arrivée",
+    "check_out": "Départ",
+    "your_pin": "Votre code d'accès",
+    "open_door": "Ouvrir la porte",
+    "opening": "Ouverture...",
+    "no_access": "Accès indisponible",
+    "outside_window": "L'accès n'est disponible que pendant votre séjour.",
+    "attempts_left": "tentatives restantes",
+    "no_attempts": "Aucune tentative disponible",
+    "error": "Erreur lors de l'ouverture de la porte"
+  }
+}

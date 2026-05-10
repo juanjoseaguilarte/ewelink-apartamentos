@@ -55,6 +55,7 @@ db.exec(`
     nombre TEXT NOT NULL DEFAULT '',
     role TEXT NOT NULL DEFAULT 'encargado',
     permisos TEXT NOT NULL DEFAULT '{}',
+    must_change_password INTEGER NOT NULL DEFAULT 0,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   );
 `);
@@ -90,6 +91,11 @@ function allPermissions(value) {
     limpieza_gestionar: value,
   };
 }
+
+// Migrate: add must_change_password if missing (existing deployments)
+try {
+  db.exec("ALTER TABLE system_users ADD COLUMN must_change_password INTEGER NOT NULL DEFAULT 0");
+} catch { /* column already exists */ }
 
 seedAdmin();
 console.log("Conectado a la base de datos SQLite.");
@@ -148,7 +154,7 @@ app.post("/api/login", async (req, res) => {
       JWT_SECRET,
       { expiresIn: "24h" }
     );
-    res.json({ token, role: user.role, nombre: user.nombre, permisos });
+    res.json({ token, role: user.role, nombre: user.nombre, permisos, must_change_password: !!user.must_change_password });
   } catch {
     res.status(500).json({ error: "Error interno" });
   }
@@ -177,7 +183,7 @@ app.post("/api/system/users", authMiddleware, adminOnly, async (req, res) => {
     const id = uuidv4();
     const permisos = role === "admin" ? allPermissions(true) : allPermissions(false);
     db.prepare(
-      "INSERT INTO system_users (id, username, password_hash, nombre, role, permisos) VALUES (?, ?, ?, ?, ?, ?)"
+      "INSERT INTO system_users (id, username, password_hash, nombre, role, permisos, must_change_password) VALUES (?, ?, ?, ?, ?, ?, 1)"
     ).run(id, username, hash, nombre || username, role, JSON.stringify(permisos));
     res.status(201).json({ id, username, nombre: nombre || username, role, permisos });
   } catch (e) {
@@ -230,6 +236,28 @@ app.delete("/api/system/users/:id", authMiddleware, adminOnly, (req, res) => {
     res.json({ message: "Usuario eliminado" });
   } catch {
     res.status(500).json({ error: "Error al eliminar el usuario" });
+  }
+});
+
+// --- Cambio de contraseña ---
+
+app.post("/api/change-password", authMiddleware, (req, res) => {
+  const { current_password, new_password } = req.body || {};
+  if (!current_password || !new_password) return res.status(400).json({ error: "Faltan campos" });
+  if (new_password.length < 6) return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
+
+  try {
+    const user = db.prepare("SELECT * FROM system_users WHERE id = ?").get(req.user.id);
+    if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+
+    const valid = bcrypt.compareSync(current_password, user.password_hash);
+    if (!valid) return res.status(401).json({ error: "Contraseña actual incorrecta" });
+
+    const hash = bcrypt.hashSync(new_password, 10);
+    db.prepare("UPDATE system_users SET password_hash = ?, must_change_password = 0 WHERE id = ?").run(hash, req.user.id);
+    res.json({ message: "Contraseña actualizada" });
+  } catch {
+    res.status(500).json({ error: "Error interno" });
   }
 });
 

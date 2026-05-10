@@ -1,0 +1,128 @@
+{
+  "nav": {
+    "reservas": "Reservas",
+    "mensajes": "Mensajes",
+    "mantenimiento": "Mantenimiento",
+    "limpieza": "Limpieza",
+    "dashboard": "Dashboard",
+    "logout": "Salir"
+  },
+  "login": {
+    "title": "Rentalsur",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "submit": "Iniciar sesión",
+    "loading": "Iniciando sesión...",
+    "error_connection": "Error de conexión",
+    "error_credentials": "Credenciales incorrectas"
+  },
+  "change_password": {
+    "title": "Cambiar contraseña",
+    "subtitle": "Por seguridad debes establecer una nueva contraseña antes de continuar.",
+    "current": "Contraseña actual",
+    "new": "Nueva contraseña",
+    "confirm": "Confirmar contraseña",
+    "submit": "Cambiar contraseña",
+    "loading": "Guardando...",
+    "error_match": "Las contraseñas no coinciden",
+    "error_length": "Mínimo 6 caracteres",
+    "success": "Contraseña cambiada correctamente"
+  },
+  "dashboard": {
+    "title": "Dashboard de usuarios",
+    "new_user": "+ Nuevo usuario",
+    "users_list": "Usuarios del sistema",
+    "permissions": "Permisos",
+    "admin_all_perms": "El admin tiene todos los permisos",
+    "admin_full_access": "Los administradores tienen acceso total al sistema.",
+    "select_user": "Selecciona un usuario para editar sus permisos",
+    "save": "Guardar permisos",
+    "saving": "Guardando...",
+    "saved": "Permisos guardados",
+    "delete_confirm": "¿Eliminar al usuario"
+  },
+  "create_user": {
+    "title": "Nuevo usuario",
+    "name": "Nombre",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "role": "Rol",
+    "submit": "Crear usuario",
+    "loading": "Creando...",
+    "cancel": "Cancelar",
+    "error_connection": "Error de conexión"
+  },
+  "perms": {
+    "reservas_ver": "Ver reservas",
+    "reservas_crear": "Crear reservas",
+    "reservas_editar": "Editar reservas",
+    "reservas_eliminar": "Eliminar reservas",
+    "mensajes_ver": "Ver mensajes",
+    "mensajes_enviar": "Enviar mensajes",
+    "mantenimiento_ver": "Ver incidencias",
+    "mantenimiento_gestionar": "Gestionar incidencias",
+    "limpieza_ver": "Ver tareas",
+    "limpieza_gestionar": "Gestionar tareas"
+  },
+  "roles": {
+    "admin": "Admin",
+    "encargado": "Encargado",
+    "mensajes": "Mensajes",
+    "mantenimiento": "Mantenimiento",
+    "limpiadora": "Limpiadora"
+  },
+  "reservas": {
+    "title": "Reservas",
+    "upcoming": "Próximas y actuales",
+    "past": "Pasadas",
+    "new": "Nueva reserva",
+    "no_upcoming": "No hay reservas próximas",
+    "no_past": "No hay reservas pasadas",
+    "entry": "Entrada",
+    "exit": "Salida",
+    "pin": "PIN",
+    "attempts": "Intentos",
+    "loading": "Cargando...",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "delete_confirm": "¿Eliminar la reserva de",
+    "guest_link": "Ver enlace huésped"
+  },
+  "form": {
+    "name": "Nombre",
+    "surname": "Apellidos",
+    "entry_date": "Fecha entrada",
+    "exit_date": "Fecha salida",
+    "entry_time": "Hora entrada",
+    "exit_time": "Hora salida",
+    "attempts": "Intentos",
+    "pin": "PIN (4-6 dígitos)",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "create": "Crear reserva",
+    "edit_title": "Editar reserva",
+    "new_title": "Nueva reserva"
+  },
+  "modules": {
+    "mensajes": "Mensajes",
+    "mantenimiento": "Mantenimiento",
+    "limpieza": "Limpieza",
+    "coming_soon": "próximamente"
+  },
+  "guest": {
+    "welcome": "Bienvenido",
+    "loading": "Cargando...",
+    "not_found": "Reserva no encontrada",
+    "check_in": "Entrada",
+    "check_out": "Salida",
+    "your_pin": "Tu PIN de acceso",
+    "open_door": "Abrir puerta",
+    "opening": "Abriendo...",
+    "no_access": "Acceso no disponible",
+    "outside_window": "El acceso solo está disponible durante tu estancia.",
+    "attempts_left": "intentos restantes",
+    "no_attempts": "Sin intentos disponibles",
+    "error": "Error al abrir la puerta"
+  }
+}
