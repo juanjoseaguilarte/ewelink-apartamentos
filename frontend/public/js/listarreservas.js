@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   msg.className = "text-muted";
 
   try {
-    const response = await authFetch("/api/usuarioall");
+    const response = await authFetch(API_BASE + "/api/usuarioall");
     if (!response.ok) {
       const data = await response.json();
       msg.textContent = data.error || "Error al cargar las reservas.";
@@ -96,7 +96,7 @@ async function borrarReserva(id, btn) {
   btn.textContent = "Borrando...";
 
   try {
-    const response = await authFetch(`/api/usuario/${id}`, { method: "DELETE" });
+    const response = await authFetch(API_BASE + `/api/usuario/${id}`, { method: "DELETE" });
     if (response.ok) {
       alert("Reserva eliminada exitosamente.");
       location.reload();

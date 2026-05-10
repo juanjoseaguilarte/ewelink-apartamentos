@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 async function fetchUserData(userId) {
   const msgDiv = document.getElementById("msg");
   try {
-    const response = await fetch(`/api/usuario/${userId}`);
+    const response = await fetch(API_BASE + `/api/usuario/${userId}`);
     if (response.ok) {
       const user = await response.json();
       displayUserInfo(user);
@@ -88,7 +88,7 @@ function formatDate(dateString) {
 async function openDoor(userId) {
   const msgDiv = document.getElementById("msg");
   try {
-    const response = await fetch(`/api/toggle-device?userId=${userId}`);
+    const response = await fetch(API_BASE + `/api/toggle-device?userId=${userId}`);
     const data = await response.json();
     if (response.ok) {
       msgDiv.textContent = "Puerta abierta exitosamente.";

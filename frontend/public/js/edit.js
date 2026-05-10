@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   try {
-    const response = await authFetch(`/api/usuario/${userId}`);
+    const response = await authFetch(API_BASE + `/api/usuario/${userId}`);
     if (response.ok) {
       const reserva = await response.json();
       document.getElementById("nombre").value = reserva.nombre || "";
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     msg.textContent = "";
 
     try {
-      const updateResponse = await authFetch(`/api/usuario/${userId}`, {
+      const updateResponse = await authFetch(API_BASE + `/api/usuario/${userId}`, {
         method: "PUT",
         body: JSON.stringify(updatedReserva),
       });

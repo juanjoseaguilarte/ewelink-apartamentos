@@ -24,7 +24,7 @@ document.getElementById("userForm").addEventListener("submit", async function (e
   msg.textContent = "";
 
   try {
-    const response = await authFetch("/api/usuario", {
+    const response = await authFetch(API_BASE + "/api/usuario", {
       method: "POST",
       body: JSON.stringify(user),
     });
