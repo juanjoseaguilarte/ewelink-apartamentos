@@ -427,6 +427,24 @@ app.delete("/api/usuario/:id", authMiddleware, requirePermission("reservas_elimi
 
 // --- Gestión de propiedades (solo admin) ---
 
+app.get("/api/system/ewelink-devices", authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const devices = await connection.getDevices();
+    if (!devices || devices.error) {
+      return res.status(502).json({ error: devices?.error ?? "No se pudieron obtener los dispositivos de eWeLink" });
+    }
+    res.json(devices.map((d) => ({
+      deviceid: d.deviceid,
+      name: d.name ?? d.deviceid,
+      online: !!d.online,
+      switch: d.params?.switch ?? "unknown",
+    })));
+  } catch (e) {
+    console.error("eWeLink getDevices error:", e);
+    res.status(500).json({ error: "Error al conectar con eWeLink" });
+  }
+});
+
 app.get("/api/system/propiedades", authMiddleware, adminOnly, (req, res) => {
   try {
     res.json(db.prepare("SELECT * FROM propiedades ORDER BY nombre").all());
