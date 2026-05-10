@@ -58,6 +58,13 @@ db.exec(`
     must_change_password INTEGER NOT NULL DEFAULT 0,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS roles (
+    id TEXT PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL,
+    display_name TEXT NOT NULL,
+    default_permisos TEXT NOT NULL
+  );
 `);
 
 // Crear admin inicial desde variables de entorno si no existe
@@ -97,7 +104,21 @@ try {
   db.exec("ALTER TABLE system_users ADD COLUMN must_change_password INTEGER NOT NULL DEFAULT 0");
 } catch { /* column already exists */ }
 
+function seedRoles() {
+  const count = db.prepare("SELECT COUNT(*) as c FROM roles").get().c;
+  if (count > 0) return;
+  const insert = db.prepare("INSERT INTO roles (id, name, display_name, default_permisos) VALUES (?, ?, ?, ?)");
+  const rolesData = [
+    { name: "encargado", display_name: "Encargado", permisos: allPermissions(true) },
+    { name: "mensajes", display_name: "Mensajes", permisos: { ...allPermissions(false), mensajes_ver: true, mensajes_enviar: true } },
+    { name: "mantenimiento", display_name: "Mantenimiento", permisos: { ...allPermissions(false), reservas_ver: true, mantenimiento_ver: true, mantenimiento_gestionar: true } },
+    { name: "limpiadora", display_name: "Limpiadora", permisos: { ...allPermissions(false), reservas_ver: true, limpieza_ver: true, limpieza_gestionar: true } },
+  ];
+  for (const r of rolesData) insert.run(uuidv4(), r.name, r.display_name, JSON.stringify(r.permisos));
+}
+
 seedAdmin();
+seedRoles();
 console.log("Conectado a la base de datos SQLite.");
 
 const connection = new ewelink({
@@ -175,13 +196,21 @@ app.post("/api/system/users", authMiddleware, adminOnly, async (req, res) => {
   const { username, password, nombre, role } = req.body || {};
   if (!username || !password || !role) return res.status(400).json({ error: "Faltan campos requeridos" });
 
-  const validRoles = ["admin", "encargado", "mensajes", "mantenimiento", "limpiadora"];
-  if (!validRoles.includes(role)) return res.status(400).json({ error: "Rol inválido" });
+  if (role !== "admin") {
+    const roleRow = db.prepare("SELECT id FROM roles WHERE name = ?").get(role);
+    if (!roleRow) return res.status(400).json({ error: "Rol inválido" });
+  }
 
   try {
     const hash = bcrypt.hashSync(password, 10);
     const id = uuidv4();
-    const permisos = role === "admin" ? allPermissions(true) : allPermissions(false);
+    let permisos;
+    if (role === "admin") {
+      permisos = allPermissions(true);
+    } else {
+      const roleRow = db.prepare("SELECT default_permisos FROM roles WHERE name = ?").get(role);
+      permisos = roleRow ? JSON.parse(roleRow.default_permisos) : allPermissions(false);
+    }
     db.prepare(
       "INSERT INTO system_users (id, username, password_hash, nombre, role, permisos, must_change_password) VALUES (?, ?, ?, ?, ?, ?, 1)"
     ).run(id, username, hash, nombre || username, role, JSON.stringify(permisos));
@@ -213,6 +242,7 @@ app.put("/api/system/users/:id", authMiddleware, adminOnly, async (req, res) => 
     if (password) {
       updates.push("password_hash = ?");
       values.push(bcrypt.hashSync(password, 10));
+      updates.push("must_change_password = 1");
     }
 
     if (updates.length === 0) return res.status(400).json({ error: "Nada que actualizar" });
@@ -373,6 +403,64 @@ app.delete("/api/usuario/:id", authMiddleware, requirePermission("reservas_elimi
     res.json({ message: "Reserva eliminada correctamente" });
   } catch {
     res.status(500).json({ error: "Error al eliminar la reserva" });
+  }
+});
+
+// --- Gestión de roles (solo admin) ---
+
+app.get("/api/system/roles", authMiddleware, adminOnly, (req, res) => {
+  try {
+    const rows = db.prepare("SELECT * FROM roles ORDER BY display_name").all();
+    res.json(rows.map((r) => ({ ...r, default_permisos: JSON.parse(r.default_permisos) })));
+  } catch {
+    res.status(500).json({ error: "Error al obtener roles" });
+  }
+});
+
+app.post("/api/system/roles", authMiddleware, adminOnly, (req, res) => {
+  const { name, display_name, default_permisos } = req.body || {};
+  if (!name || !display_name || !default_permisos) return res.status(400).json({ error: "Faltan campos requeridos" });
+  if (name === "admin") return res.status(400).json({ error: "El nombre 'admin' está reservado" });
+  if (!/^[a-z0-9_]+$/.test(name)) return res.status(400).json({ error: "El nombre solo puede contener letras minúsculas, números y guiones bajos" });
+  try {
+    const id = uuidv4();
+    db.prepare("INSERT INTO roles (id, name, display_name, default_permisos) VALUES (?, ?, ?, ?)").run(id, name, display_name, JSON.stringify(default_permisos));
+    res.status(201).json({ id, name, display_name, default_permisos });
+  } catch (e) {
+    if (e.message?.includes("UNIQUE")) return res.status(409).json({ error: "Ya existe un rol con ese nombre" });
+    res.status(500).json({ error: "Error al crear el rol" });
+  }
+});
+
+app.put("/api/system/roles/:id", authMiddleware, adminOnly, (req, res) => {
+  const { display_name, default_permisos } = req.body || {};
+  if (!display_name && !default_permisos) return res.status(400).json({ error: "Nada que actualizar" });
+  try {
+    const role = db.prepare("SELECT * FROM roles WHERE id = ?").get(req.params.id);
+    if (!role) return res.status(404).json({ error: "Rol no encontrado" });
+    const updates = [];
+    const values = [];
+    if (display_name) { updates.push("display_name = ?"); values.push(display_name); }
+    if (default_permisos) { updates.push("default_permisos = ?"); values.push(JSON.stringify(default_permisos)); }
+    values.push(req.params.id);
+    db.prepare(`UPDATE roles SET ${updates.join(", ")} WHERE id = ?`).run(...values);
+    const updated = db.prepare("SELECT * FROM roles WHERE id = ?").get(req.params.id);
+    res.json({ ...updated, default_permisos: JSON.parse(updated.default_permisos) });
+  } catch {
+    res.status(500).json({ error: "Error al actualizar el rol" });
+  }
+});
+
+app.delete("/api/system/roles/:id", authMiddleware, adminOnly, (req, res) => {
+  try {
+    const role = db.prepare("SELECT * FROM roles WHERE id = ?").get(req.params.id);
+    if (!role) return res.status(404).json({ error: "Rol no encontrado" });
+    const usersWithRole = db.prepare("SELECT COUNT(*) as c FROM system_users WHERE role = ?").get(role.name).c;
+    if (usersWithRole > 0) return res.status(409).json({ error: `No se puede eliminar: hay ${usersWithRole} usuario(s) con este rol` });
+    db.prepare("DELETE FROM roles WHERE id = ?").run(req.params.id);
+    res.json({ message: "Rol eliminado" });
+  } catch {
+    res.status(500).json({ error: "Error al eliminar el rol" });
   }
 });
 
