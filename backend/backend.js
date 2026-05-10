@@ -122,6 +122,7 @@ function allPermissions(value) {
 // Migrations for existing deployments
 try { db.exec("ALTER TABLE system_users ADD COLUMN must_change_password INTEGER NOT NULL DEFAULT 0"); } catch { /* exists */ }
 try { db.exec("ALTER TABLE usuarios ADD COLUMN property_id TEXT DEFAULT NULL"); } catch { /* exists */ }
+try { db.exec("ALTER TABLE usuarios ADD COLUMN device_id TEXT DEFAULT NULL"); } catch { /* exists */ }
 
 function seedRoles() {
   const count = db.prepare("SELECT COUNT(*) as c FROM roles").get().c;
@@ -361,7 +362,9 @@ app.get("/api/toggle-device", toggleDeviceLimiter, async (req, res) => {
     if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
     if (!isWithinAccessWindow(user)) return res.status(403).json({ error: "Fuera de las fechas u horas permitidas" });
     if (user.intentos <= 0) return res.status(400).json({ error: "No hay intentos disponibles" });
-    await connection.toggleDevice(process.env.DEVICE_ID);
+    const targetDevice = user.device_id || process.env.DEVICE_ID;
+    if (!targetDevice) return res.status(500).json({ error: "No hay dispositivo configurado para esta reserva" });
+    await connection.toggleDevice(targetDevice);
     db.prepare("UPDATE usuarios SET intentos = intentos - 1 WHERE id = ? AND intentos > 0").run(userId);
     res.json({ message: "Dispositivo activado" });
   } catch (error) {
@@ -384,14 +387,14 @@ app.post("/api/usuario", authMiddleware, requirePermission("reservas_crear"), (r
   const fields = req.body;
   const validationError = validateReserva(fields);
   if (validationError) return res.status(400).json({ error: validationError });
-  const { nombre, apellido, fecha_entrada, fecha_salida, intentos, pin, hora_entrada = "16:00", hora_salida = "12:00", property_id = null } = fields;
+  const { nombre, apellido, fecha_entrada, fecha_salida, intentos, pin, hora_entrada = "16:00", hora_salida = "12:00", property_id = null, device_id = null } = fields;
   const id = uuidv4();
   try {
     db.prepare(
-      `INSERT INTO usuarios (id, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin, property_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(id, nombre, apellido, fecha_entrada, fecha_salida, parseInt(intentos, 10), hora_entrada, hora_salida, pin, property_id);
-    res.status(201).json({ id, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin, property_id });
+      `INSERT INTO usuarios (id, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin, property_id, device_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(id, nombre, apellido, fecha_entrada, fecha_salida, parseInt(intentos, 10), hora_entrada, hora_salida, pin, property_id, device_id);
+    res.status(201).json({ id, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin, property_id, device_id });
   } catch {
     res.status(500).json({ error: "Error al agregar la reserva" });
   }
@@ -402,14 +405,14 @@ app.put("/api/usuario/:id", authMiddleware, requirePermission("reservas_editar")
   const fields = req.body;
   const validationError = validateReserva(fields);
   if (validationError) return res.status(400).json({ error: validationError });
-  const { nombre, apellido, fecha_entrada, fecha_salida, intentos, pin, hora_entrada = "16:00", hora_salida = "12:00", property_id = null } = fields;
+  const { nombre, apellido, fecha_entrada, fecha_salida, intentos, pin, hora_entrada = "16:00", hora_salida = "12:00", property_id = null, device_id = null } = fields;
   try {
     const result = db.prepare(
       `UPDATE usuarios SET nombre=?, apellido=?, fecha_entrada=?, fecha_salida=?,
-       intentos=?, hora_entrada=?, hora_salida=?, pin=?, property_id=? WHERE id=?`
-    ).run(nombre, apellido, fecha_entrada, fecha_salida, parseInt(intentos, 10), hora_entrada, hora_salida, pin, property_id, userId);
+       intentos=?, hora_entrada=?, hora_salida=?, pin=?, property_id=?, device_id=? WHERE id=?`
+    ).run(nombre, apellido, fecha_entrada, fecha_salida, parseInt(intentos, 10), hora_entrada, hora_salida, pin, property_id, device_id, userId);
     if (result.changes === 0) return res.status(404).json({ error: "Reserva no encontrada" });
-    res.json({ id: userId, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin, property_id });
+    res.json({ id: userId, nombre, apellido, fecha_entrada, fecha_salida, intentos, hora_entrada, hora_salida, pin, property_id, device_id });
   } catch {
     res.status(500).json({ error: "Error al actualizar la reserva" });
   }

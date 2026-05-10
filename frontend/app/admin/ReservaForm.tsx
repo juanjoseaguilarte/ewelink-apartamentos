@@ -12,6 +12,7 @@ export type ReservaFields = {
   intentos: string;
   pin: string;
   property_id: string;
+  device_id: string;
 };
 
 export const defaultFields: ReservaFields = {
@@ -24,9 +25,10 @@ export const defaultFields: ReservaFields = {
   intentos: "5",
   pin: "",
   property_id: "",
+  device_id: "",
 };
 
-export type Propiedad = { id: string; nombre: string; direccion: string };
+export type Propiedad = { id: string; nombre: string; direccion: string; device_id: string };
 
 type Props = {
   initial?: Partial<ReservaFields>;
@@ -70,6 +72,14 @@ export default function ReservaForm({ initial = {}, onSubmit, submitLabel, succe
     return (v: string) => setFields((f) => ({ ...f, [key]: v }));
   }
 
+  function selectProperty(p: Propiedad) {
+    setFields((f) => ({ ...f, property_id: p.id, device_id: p.device_id }));
+  }
+
+  function clearProperty() {
+    setFields((f) => ({ ...f, property_id: "", device_id: "" }));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMsg("");
@@ -84,6 +94,9 @@ export default function ReservaForm({ initial = {}, onSubmit, submitLabel, succe
     }
     setLoading(false);
   }
+
+  const withDevice = propiedades?.filter((p) => p.device_id) ?? [];
+  const withoutDevice = propiedades?.filter((p) => !p.device_id) ?? [];
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow p-6 space-y-4 max-w-lg">
@@ -103,21 +116,66 @@ export default function ReservaForm({ initial = {}, onSubmit, submitLabel, succe
         <Field label="Intentos" name="intentos" type="number" min="1" max="100" value={fields.intentos} onChange={set("intentos")} />
         <Field label="PIN caja fuerte" name="pin" value={fields.pin} onChange={set("pin")} placeholder="ej. 1234" />
       </div>
+
       {propiedades && propiedades.length > 0 && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Propiedad</label>
-          <select
-            value={fields.property_id}
-            onChange={(e) => setFields((f) => ({ ...f, property_id: e.target.value }))}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">— Sin asignar —</option>
-            {propiedades.map((p) => (
-              <option key={p.id} value={p.id}>{p.nombre}{p.direccion ? ` · ${p.direccion}` : ""}</option>
-            ))}
-          </select>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Propiedad / Dispositivo</label>
+          <div className="space-y-2">
+            {withDevice.map((p) => {
+              const selected = fields.property_id === p.id;
+              return (
+                <label
+                  key={p.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                    selected
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:border-gray-300 bg-white"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="property_id"
+                    value={p.id}
+                    checked={selected}
+                    onChange={() => selectProperty(p)}
+                    className="accent-blue-600"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-gray-800">{p.nombre}</p>
+                    {p.direccion && <p className="text-xs text-gray-500">{p.direccion}</p>}
+                    <p className="text-xs font-mono text-blue-600 mt-0.5">{p.device_id}</p>
+                  </div>
+                  {selected && <span className="text-blue-500 text-lg shrink-0">✓</span>}
+                </label>
+              );
+            })}
+
+            {withoutDevice.length > 0 && (
+              <details className="text-xs text-gray-400 cursor-pointer">
+                <summary className="select-none hover:text-gray-600">
+                  {withoutDevice.length} propiedad(es) sin dispositivo asignado
+                </summary>
+                <div className="mt-2 space-y-1 pl-2">
+                  {withoutDevice.map((p) => (
+                    <p key={p.id} className="text-gray-400">{p.nombre} — asigna un dispositivo en Propiedades</p>
+                  ))}
+                </div>
+              </details>
+            )}
+
+            {fields.property_id && (
+              <button
+                type="button"
+                onClick={clearProperty}
+                className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+              >
+                × Quitar selección
+              </button>
+            )}
+          </div>
         </div>
       )}
+
       {msg && (
         <p className={`text-sm font-medium ${msgOk ? "text-green-600" : "text-red-600"}`}>{msg}</p>
       )}

@@ -29,6 +29,7 @@ export default function EditarReservaPage() {
         intentos: String(data.intentos ?? 5),
         pin: data.pin ?? "",
         property_id: data.property_id ?? "",
+        device_id: data.device_id ?? "",
       });
       setPropiedades(props);
     }).catch(() => setError("Error de conexión"));
