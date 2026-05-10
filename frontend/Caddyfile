@@ -3,7 +3,7 @@
 }
 
 :80 {
-	root * /srv
+	root * /srv/public
 	file_server
 
 	reverse_proxy /api/* {$BACKEND_URL}
