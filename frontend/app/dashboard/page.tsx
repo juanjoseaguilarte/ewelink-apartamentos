@@ -28,7 +28,7 @@ const PERMS: { key: keyof Permisos; label: string; grupo: string }[] = [
 ];
 
 const emptyPermisos = (): Permisos =>
-  Object.fromEntries(PERMS.map((p) => [p.key, false])) as Permisos;
+  Object.fromEntries(PERMS.map((p) => [p.key, false])) as unknown as Permisos;
 
 export default function DashboardPage() {
   const router = useRouter();
