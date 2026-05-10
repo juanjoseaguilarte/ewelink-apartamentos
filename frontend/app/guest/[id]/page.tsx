@@ -17,7 +17,41 @@ type User = {
   pin?: string;
 };
 
-const t = {
+const LANGS = [
+  { code: "es", flag: "🇪🇸", locale: "es-ES" },
+  { code: "en", flag: "🇬🇧", locale: "en-GB" },
+  { code: "fr", flag: "🇫🇷", locale: "fr-FR" },
+  { code: "de", flag: "🇩🇪", locale: "de-DE" },
+  { code: "pt", flag: "🇵🇹", locale: "pt-PT" },
+] as const;
+
+type Lang = (typeof LANGS)[number]["code"];
+
+type Tr = {
+  title: string;
+  arrival: string;
+  noSchedules: string;
+  address: string;
+  mapsLink: string;
+  pinLabel: string;
+  openDoor: string;
+  opening: string;
+  success: string;
+  confirm: string;
+  name: string;
+  surname: string;
+  checkin: string;
+  checkout: string;
+  checkinTime: string;
+  checkoutTime: string;
+  attemptsLeft: string;
+  attemptsInfo: (n: number) => string;
+  notFound: string;
+  noId: string;
+  serverError: string;
+};
+
+const t: Record<Lang, Tr> = {
   es: {
     title: "Apertura de Puerta",
     arrival: "Llegada Autónoma",
@@ -36,12 +70,11 @@ const t = {
     checkinTime: "Hora de Entrada",
     checkoutTime: "Hora de Salida",
     attemptsLeft: "Intentos Restantes",
-    attemptsInfo: (n: number) =>
+    attemptsInfo: (n) =>
       `Tiene ${n} intentos para abrir la puerta principal. Suba el ascensor a la tercera planta, gire a la derecha, es la primera puerta. Encontrará una cajita de seguridad; introduzca el código que aparece.`,
     notFound: "Usuario no encontrado.",
     noId: "No se proporcionó un ID de usuario.",
     serverError: "Error al conectar con el servidor.",
-    switchLang: "Translate to English",
   },
   en: {
     title: "Door Opening",
@@ -61,19 +94,89 @@ const t = {
     checkinTime: "Check-in Time",
     checkoutTime: "Check-out Time",
     attemptsLeft: "Remaining Attempts",
-    attemptsInfo: (n: number) =>
+    attemptsInfo: (n) =>
       `You have ${n} attempts to open the main door. Take the elevator to the third floor, turn right — it's the first door. You'll find a small safe box; enter the code shown.`,
     notFound: "User not found.",
     noId: "No user ID provided.",
     serverError: "Error connecting to the server.",
-    switchLang: "Traducir al Español",
   },
-} as const;
-
-type Lang = keyof typeof t;
+  fr: {
+    title: "Ouverture de Porte",
+    arrival: "Arrivée Autonome",
+    noSchedules: "Sans Horaires",
+    address: "Adresse : Avenida La Banqueta 14 3-1",
+    mapsLink: "Voir sur Google Maps",
+    pinLabel: "Code Coffre-fort",
+    openDoor: "Ouvrir la Porte",
+    opening: "Ouverture...",
+    success: "Porte ouverte avec succès.",
+    confirm: "Voulez-vous ouvrir la porte ? Cela utilisera une tentative.",
+    name: "Prénom",
+    surname: "Nom",
+    checkin: "Date d'arrivée",
+    checkout: "Date de départ",
+    checkinTime: "Heure d'arrivée",
+    checkoutTime: "Heure de départ",
+    attemptsLeft: "Tentatives restantes",
+    attemptsInfo: (n) =>
+      `Vous avez ${n} tentatives pour ouvrir la porte principale. Prenez l'ascenseur au troisième étage, tournez à droite — c'est la première porte. Vous trouverez un petit coffre ; entrez le code affiché.`,
+    notFound: "Utilisateur non trouvé.",
+    noId: "Aucun identifiant fourni.",
+    serverError: "Erreur de connexion au serveur.",
+  },
+  de: {
+    title: "Türöffnung",
+    arrival: "Autonome Ankunft",
+    noSchedules: "Keine Zeitpläne",
+    address: "Adresse: Avenida La Banqueta 14 3-1",
+    mapsLink: "Auf Google Maps ansehen",
+    pinLabel: "Safe-Code",
+    openDoor: "Tür öffnen",
+    opening: "Wird geöffnet...",
+    success: "Tür erfolgreich geöffnet.",
+    confirm: "Möchten Sie die Tür öffnen? Dies verbraucht einen Versuch.",
+    name: "Vorname",
+    surname: "Nachname",
+    checkin: "Anreisedatum",
+    checkout: "Abreisedatum",
+    checkinTime: "Anreisezeit",
+    checkoutTime: "Abreisezeit",
+    attemptsLeft: "Verbleibende Versuche",
+    attemptsInfo: (n) =>
+      `Sie haben ${n} Versuche, die Haupttür zu öffnen. Fahren Sie mit dem Aufzug in den dritten Stock, biegen Sie rechts ab — es ist die erste Tür. Sie finden einen kleinen Safe; geben Sie den angezeigten Code ein.`,
+    notFound: "Benutzer nicht gefunden.",
+    noId: "Keine Benutzer-ID angegeben.",
+    serverError: "Verbindungsfehler zum Server.",
+  },
+  pt: {
+    title: "Abertura de Porta",
+    arrival: "Chegada Autónoma",
+    noSchedules: "Sem Horários",
+    address: "Endereço: Avenida La Banqueta 14 3-1",
+    mapsLink: "Ver no Google Maps",
+    pinLabel: "Código do Cofre",
+    openDoor: "Abrir Porta",
+    opening: "Abrindo...",
+    success: "Porta aberta com sucesso.",
+    confirm: "Tem certeza que deseja abrir a porta? Isso usará uma tentativa.",
+    name: "Nome",
+    surname: "Apelido",
+    checkin: "Data de Entrada",
+    checkout: "Data de Saída",
+    checkinTime: "Hora de Entrada",
+    checkoutTime: "Hora de Saída",
+    attemptsLeft: "Tentativas Restantes",
+    attemptsInfo: (n) =>
+      `Tem ${n} tentativas para abrir a porta principal. Suba o elevador ao terceiro andar, vire à direita — é a primeira porta. Encontrará um pequeno cofre; introduza o código apresentado.`,
+    notFound: "Utilizador não encontrado.",
+    noId: "Nenhum ID de utilizador fornecido.",
+    serverError: "Erro ao ligar ao servidor.",
+  },
+};
 
 function formatDate(dateString: string, lang: Lang) {
-  return new Date(dateString).toLocaleDateString(lang === "es" ? "es-ES" : "en-GB", {
+  const locale = LANGS.find((l) => l.code === lang)?.locale ?? "es-ES";
+  return new Date(dateString).toLocaleDateString(locale, {
     day: "2-digit",
     month: "long",
     year: "numeric",
@@ -105,9 +208,7 @@ export default function GuestPage() {
     }
   }, [userId, tr]);
 
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+  useEffect(() => { fetchUser(); }, [fetchUser]);
 
   async function handleOpenDoor() {
     if (!confirm(tr.confirm)) return;
@@ -139,16 +240,28 @@ export default function GuestPage() {
     <main className="min-h-screen bg-gray-100 flex items-start justify-center py-8 px-4">
       <div className="w-full max-w-md space-y-4">
 
+        {/* Language selector */}
+        <div className="flex justify-center gap-2">
+          {LANGS.map(({ code, flag }) => (
+            <button
+              key={code}
+              onClick={() => setLang(code)}
+              title={code.toUpperCase()}
+              className={`text-2xl leading-none p-1.5 rounded-lg transition-all ${
+                lang === code
+                  ? "ring-2 ring-blue-500 bg-white shadow"
+                  : "opacity-50 hover:opacity-80"
+              }`}
+            >
+              {flag}
+            </button>
+          ))}
+        </div>
+
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold text-gray-800">{tr.title}</h1>
-          <button
-            onClick={() => setLang(lang === "es" ? "en" : "es")}
-            className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded-full hover:bg-blue-700 transition-colors"
-          >
-            {tr.switchLang}
-          </button>
-          <div className="space-y-1 text-gray-700 pt-2">
+          <div className="space-y-1 text-gray-700 pt-1">
             <p className="font-semibold">{tr.arrival}</p>
             <p className="font-semibold">{tr.noSchedules}</p>
             <p>{tr.address}</p>
@@ -195,7 +308,6 @@ export default function GuestPage() {
           </div>
         )}
 
-        {/* Message */}
         {msg && (
           <p className={`text-center font-medium py-2 ${msgOk ? "text-green-600" : "text-red-600"}`}>
             {msg}
@@ -208,8 +320,6 @@ export default function GuestPage() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <p>
-      <span className="font-semibold">{label}:</span> {value}
-    </p>
+    <p><span className="font-semibold">{label}:</span> {value}</p>
   );
 }
