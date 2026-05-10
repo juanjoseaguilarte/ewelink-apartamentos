@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { authFetch } from "@/lib/auth";
 import Link from "next/link";
 
+
 type Reserva = {
   id: string;
   nombre: string;
@@ -127,6 +128,13 @@ function Section({
                 >
                   Copiar link
                 </button>
+                <Link
+                  href={`/guest/${r.id}`}
+                  target="_blank"
+                  className="px-3 py-1.5 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
+                >
+                  Ver enlace
+                </Link>
                 <button
                   onClick={() => onDelete(r.id)}
                   className="px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
