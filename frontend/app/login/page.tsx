@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/api";
-import { getToken, setToken } from "@/lib/auth";
+import { getToken, setToken, setUserInfo } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,6 +25,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (res.ok) {
         setToken(data.token);
+        setUserInfo({ role: data.role, nombre: data.nombre, permisos: data.permisos });
         router.push("/admin");
       } else {
         setError(data.error ?? "Credenciales incorrectas");
@@ -39,7 +40,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Rentalsur Admin</h1>
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Rentalsur</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Usuario</label>

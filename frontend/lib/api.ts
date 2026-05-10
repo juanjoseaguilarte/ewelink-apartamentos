@@ -1,62 +1,39 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
 
 async function request(path: string, options: RequestInit = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
+  return fetch(`${API_BASE}${path}`, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers ?? {}),
-    },
+    headers: { "Content-Type": "application/json", ...(options.headers ?? {}) },
   });
-  return res;
 }
 
-function authHeaders(token: string) {
+function auth(token: string) {
   return { Authorization: `Bearer ${token}` };
 }
 
-export async function login(username: string, password: string) {
-  return request("/api/login", {
-    method: "POST",
-    body: JSON.stringify({ username, password }),
-  });
-}
+// Auth
+export const login = (username: string, password: string) =>
+  request("/api/login", { method: "POST", body: JSON.stringify({ username, password }) });
 
-export async function getReservas(token: string) {
-  return request("/api/usuarioall", { headers: authHeaders(token) });
-}
+// Reservas huésped (público)
+export const getGuestData = (id: string) => request(`/api/usuario/${id}`);
+export const toggleDevice = (userId: string) => request(`/api/toggle-device?userId=${userId}`);
 
-export async function getReserva(id: string, token: string) {
-  return request(`/api/usuario/${id}`, { headers: authHeaders(token) });
-}
+// Reservas admin
+export const getReservas = (token: string) => request("/api/usuarioall", { headers: auth(token) });
+export const getReserva = (id: string, token: string) => request(`/api/usuario/${id}`, { headers: auth(token) });
+export const createReserva = (data: object, token: string) =>
+  request("/api/usuario", { method: "POST", body: JSON.stringify(data), headers: auth(token) });
+export const updateReserva = (id: string, data: object, token: string) =>
+  request(`/api/usuario/${id}`, { method: "PUT", body: JSON.stringify(data), headers: auth(token) });
+export const deleteReserva = (id: string, token: string) =>
+  request(`/api/usuario/${id}`, { method: "DELETE", headers: auth(token) });
 
-export async function createReserva(data: object, token: string) {
-  return request("/api/usuario", {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: authHeaders(token),
-  });
-}
-
-export async function updateReserva(id: string, data: object, token: string) {
-  return request(`/api/usuario/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-    headers: authHeaders(token),
-  });
-}
-
-export async function deleteReserva(id: string, token: string) {
-  return request(`/api/usuario/${id}`, {
-    method: "DELETE",
-    headers: authHeaders(token),
-  });
-}
-
-export async function getGuestData(id: string) {
-  return request(`/api/usuario/${id}`);
-}
-
-export async function toggleDevice(userId: string) {
-  return request(`/api/toggle-device?userId=${userId}`);
-}
+// Usuarios del sistema
+export const getSystemUsers = (token: string) => request("/api/system/users", { headers: auth(token) });
+export const createSystemUser = (data: object, token: string) =>
+  request("/api/system/users", { method: "POST", body: JSON.stringify(data), headers: auth(token) });
+export const updateSystemUser = (id: string, data: object, token: string) =>
+  request(`/api/system/users/${id}`, { method: "PUT", body: JSON.stringify(data), headers: auth(token) });
+export const deleteSystemUser = (id: string, token: string) =>
+  request(`/api/system/users/${id}`, { method: "DELETE", headers: auth(token) });
