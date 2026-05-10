@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { getUser, logout } from "@/lib/auth";
 import Link from "next/link";
+import UpdateBanner from "./UpdateBanner";
 
 type Permisos = Record<string, boolean>;
 
@@ -47,6 +48,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <UpdateBanner />
       <nav className="bg-blue-700 text-white shadow">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4 flex-wrap">
