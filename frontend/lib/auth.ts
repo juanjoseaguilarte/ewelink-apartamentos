@@ -9,8 +9,14 @@ export function getUser() {
   if (typeof window === "undefined") return null;
   const token = localStorage.getItem("adminToken");
   if (!token) return null;
+  let id = "";
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    id = payload.id ?? "";
+  } catch { /* ignore */ }
   return {
     token,
+    id,
     role: localStorage.getItem("adminRole") ?? "",
     nombre: localStorage.getItem("adminNombre") ?? "",
     permisos: JSON.parse(localStorage.getItem("adminPermisos") ?? "{}"),
@@ -22,11 +28,13 @@ export function saveSession(data: {
   role: string;
   nombre: string;
   permisos: Record<string, boolean>;
+  id?: string;
 }) {
   localStorage.setItem("adminToken", data.token);
   localStorage.setItem("adminRole", data.role);
   localStorage.setItem("adminNombre", data.nombre);
   localStorage.setItem("adminPermisos", JSON.stringify(data.permisos));
+  if (data.id) localStorage.setItem("adminId", data.id);
 }
 
 export function logout() {

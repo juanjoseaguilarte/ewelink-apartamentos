@@ -1,3 +1,13 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { getToken } from "@/lib/auth";
+
 export default function Home() {
-  return <p>OK</p>;
+  const router = useRouter();
+  useEffect(() => {
+    router.replace(getToken() ? "/admin" : "/login");
+  }, [router]);
+  return null;
 }

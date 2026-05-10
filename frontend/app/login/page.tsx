@@ -8,6 +8,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [checking, setChecking] = useState(true);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
@@ -19,8 +20,14 @@ export default function LoginPage() {
   const [newPwd2, setNewPwd2] = useState("");
 
   useEffect(() => {
-    if (getToken()) router.replace("/admin");
+    if (getToken()) {
+      router.replace("/admin");
+    } else {
+      setChecking(false);
+    }
   }, [router]);
+
+  if (checking) return null;
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
