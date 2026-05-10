@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import ReservaForm, { ReservaFields, Propiedad } from "../ReservaForm";
 import { authFetch } from "@/lib/auth";
 
 export default function NuevaReservaPage() {
+  const router = useRouter();
   const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
   const [propsLoaded, setPropsLoaded] = useState(false);
 
@@ -25,7 +27,8 @@ export default function NuevaReservaPage() {
       body: JSON.stringify({ ...fields, intentos: parseInt(fields.intentos, 10) }),
     });
     const data = await res.json();
-    return res.ok ? { ok: true } : { ok: false, error: data.error };
+    if (res.ok) { router.push("/admin"); return { ok: true }; }
+    return { ok: false, error: data.error };
   }
 
   return (
