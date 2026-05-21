@@ -362,9 +362,23 @@ app.get("/api/toggle-device", toggleDeviceLimiter, async (req, res) => {
     if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
     if (!isWithinAccessWindow(user)) return res.status(403).json({ error: "Fuera de las fechas u horas permitidas" });
     if (user.intentos <= 0) return res.status(400).json({ error: "No hay intentos disponibles" });
+
     const targetDevice = user.device_id || process.env.DEVICE_ID;
     if (!targetDevice) return res.status(500).json({ error: "No hay dispositivo configurado para esta reserva" });
-    await connection.toggleDevice(targetDevice);
+
+    let result = await connection.toggleDevice(targetDevice);
+
+    // Si el token expiró, forzar re-autenticación y reintentar
+    if (result?.error === 401 || result?.error === 403) {
+      connection.at = null;
+      result = await connection.toggleDevice(targetDevice);
+    }
+
+    if (result?.error) {
+      console.error("eWeLink toggleDevice error:", result);
+      return res.status(500).json({ error: `Error al abrir: ${result.msg || result.error}` });
+    }
+
     db.prepare("UPDATE usuarios SET intentos = intentos - 1 WHERE id = ? AND intentos > 0").run(userId);
     res.json({ message: "Dispositivo activado" });
   } catch (error) {
@@ -432,9 +446,13 @@ app.delete("/api/usuario/:id", authMiddleware, requirePermission("reservas_elimi
 
 app.get("/api/system/ewelink-devices", authMiddleware, adminOnly, async (req, res) => {
   try {
-    const devices = await connection.getDevices();
+    let devices = await connection.getDevices();
+    if (devices?.error === 401 || devices?.error === 403) {
+      connection.at = null;
+      devices = await connection.getDevices();
+    }
     if (!devices || devices.error) {
-      return res.status(502).json({ error: devices?.error ?? "No se pudieron obtener los dispositivos de eWeLink" });
+      return res.status(502).json({ error: `eWeLink: ${devices?.msg ?? devices?.error ?? "sin respuesta"}` });
     }
     res.json(devices.map((d) => ({
       deviceid: d.deviceid,
